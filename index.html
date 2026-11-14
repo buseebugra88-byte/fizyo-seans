@@ -2,14 +2,15 @@
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fizyo Seans – Tedavi ve Seans Yönetimi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>:root{
-  --paper:#f5f2ec; --card:#fffdf9; --ink:#1c2626; --ink2:#4c5a58; --mute:#8a9593; --line:#e4ded3;
-  --teal:#0d6556; --teal2:#e2efe9; --teal3:#b9d8cd; --clay:#b8572f; --clay2:#f8e7dd; --gold:#a77a14; --gold2:#f6edd2;
-  --red:#b3261e; --red2:#fbe5e3; --green:#2e7d4f; --green2:#e3f2e8;
-  --noro:#5b4b9a; --orto:#0d6556; --ped:#c06a1a; --kardiyo:#b3261e;
-  --r:14px; --shadow:0 1px 2px rgba(28,38,38,.05),0 4px 16px rgba(28,38,38,.05);
-  --f-d:"Fraunces",Georgia,serif; --f-b:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --paper:#f3f4f7; --card:#ffffff; --ink:#0d1017; --ink2:#3b4250; --mute:#7a8191; --line:#dde0e8;
+  --teal:#5b2fd4; --teal2:#efeafd; --teal3:#cdbff8; --clay:#1c5fdc; --clay2:#e7effd; --gold:#9a6200; --gold2:#fbf1dc;
+  --red:#d01b2f; --red2:#fde8eb; --green:#14804a; --green2:#e2f4ea;
+  --noro:#5b2fd4; --orto:#1c5fdc; --ped:#9a6200; --kardiyo:#d01b2f;
+  --side:#0b0d13; --side2:#151924; --sidet:#aab1c0;
+  --r:8px; --shadow:0 1px 2px rgba(13,16,23,.06);
+  --f-d:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-b:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -25,7 +26,7 @@ a{color:var(--teal)}
 .brand b{font-family:var(--f-d);font-size:17px;display:block;line-height:1.1}
 .brand small{color:var(--mute);font-size:12px}
 .nav{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:0;background:none;cursor:pointer;text-align:left;color:var(--ink2);font-weight:500;width:100%}
-.nav:hover{background:rgba(13,101,86,.07);color:var(--ink)}
+.nav:hover{background:rgba(91,47,212,.07);color:var(--ink)}
 .nav.on{background:var(--card);color:var(--teal);box-shadow:var(--shadow)}
 .nav svg{width:18px;height:18px;flex:none}
 .nav .pill{margin-left:auto;background:var(--clay);color:#fff;font-size:11px;padding:1px 7px;border-radius:99px}
@@ -50,7 +51,7 @@ main{padding:28px 34px 80px;max-width:1180px;width:100%}
 .btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:550;font-size:14px;white-space:nowrap}
 .btn:hover{border-color:var(--teal3)}
 .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff}
-.btn.pri:hover{background:#0a5548}
+.btn.pri:hover{background:#4a22b8}
 .btn.clay{background:var(--clay);border-color:var(--clay);color:#fff}
 .btn.ghost{background:none;border-color:transparent;color:var(--ink2)}
 .btn.ghost:hover{background:rgba(0,0,0,.04)}
@@ -63,7 +64,7 @@ main{padding:28px 34px 80px;max-width:1180px;width:100%}
 /* inputs */
 label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:550;color:var(--ink2)}
 input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;width:100%;font-size:14.5px;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,101,86,.12)}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(91,47,212,.12)}
 textarea{resize:vertical;min-height:70px}
 .search{position:relative;flex:1;min-width:200px}
 .search input{padding-left:34px}
@@ -73,9 +74,9 @@ textarea{resize:vertical;min-height:70px}
 .chip{border:1px solid var(--line);background:var(--card);padding:5px 12px;border-radius:99px;font-size:13px;cursor:pointer;font-weight:500;color:var(--ink2)}
 .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
 .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--teal2);color:var(--teal);letter-spacing:.01em}
-.tag.noro{background:#ebe7f6;color:var(--noro)} .tag.orto{background:var(--teal2);color:var(--orto)} .tag.ped{background:#fbecdc;color:var(--ped)} .tag.kardiyo{background:var(--red2);color:var(--kardiyo)}
-.tag.kadin{background:#f8e6ee;color:#9b3561}
-.tag.gray{background:#eeebe5;color:var(--ink2)}
+.tag.noro{background:#efeafd;color:var(--noro)} .tag.orto{background:var(--teal2);color:var(--orto)} .tag.ped{background:#fbf1dc;color:var(--ped)} .tag.kardiyo{background:var(--red2);color:var(--kardiyo)}
+.tag.kadin{background:#fbe7f1;color:#a3236b}
+.tag.gray{background:#eceef3;color:var(--ink2)}
 /* subtabs */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
 .tab{border:0;background:none;padding:10px 14px;cursor:pointer;color:var(--ink2);font-weight:550;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -84,7 +85,7 @@ textarea{resize:vertical;min-height:70px}
 .list{display:flex;flex-direction:column}
 .li{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
 .li:last-child{border-bottom:0}
-.li:hover{background:rgba(13,101,86,.03)}
+.li:hover{background:rgba(91,47,212,.03)}
 .avatar{width:38px;height:38px;border-radius:50%;background:var(--teal2);color:var(--teal);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
 .li .t{font-weight:600}
 .li .s{font-size:13px;color:var(--mute)}
@@ -97,9 +98,9 @@ textarea{resize:vertical;min-height:70px}
 .det h3{margin:18px 0 8px;font-size:15px;font-family:var(--f-b);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal)}
 .det ul{margin:0;padding-left:20px} .det li{margin:4px 0}
 .note{border-radius:10px;padding:10px 14px;font-size:14px}
-.note.warn{background:var(--clay2);color:#7a3417}
-.note.info{background:var(--teal2);color:#0a4a40}
-.note.gold{background:var(--gold2);color:#6b4e0c}
+.note.warn{background:var(--clay2);color:#123f99}
+.note.info{background:var(--teal2);color:#3b1c99}
+.note.gold{background:var(--gold2);color:#6b4500}
 .note.red{background:var(--red2);color:var(--red)}
 .phase{border-left:3px solid var(--teal3);padding:4px 0 4px 12px;margin:8px 0}
 .phase b{display:block;font-size:14px}
@@ -121,13 +122,13 @@ tr:last-child td{border-bottom:0}
 .sitem{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px}
 .sitem.done{background:var(--green2);border-color:#bfe0cb}
 .sitem .cd{font-variant-numeric:tabular-nums;font-weight:700;min-width:56px;text-align:right}
-.sitem.run{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,101,86,.12)}
+.sitem.run{border-color:var(--teal);box-shadow:0 0 0 3px rgba(91,47,212,.12)}
 .check{width:22px;height:22px;border-radius:7px;border:2px solid var(--teal3);display:grid;place-items:center;cursor:pointer;background:#fff;flex:none}
 .sitem.done .check{background:var(--green);border-color:var(--green);color:#fff}
 .check svg{width:14px;height:14px}
 .vitals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 /* modal */
-.ov{position:fixed;inset:0;background:rgba(20,28,28,.42);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto;animation:fade .15s}
+.ov{position:fixed;inset:0;background:rgba(8,10,16,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto;animation:fade .15s}
 .modal{background:var(--card);border-radius:18px;width:100%;max-width:760px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:pop .18s}
 .modal.sm{max-width:440px}
 .modal.lg{max-width:900px}
@@ -181,6 +182,50 @@ main{min-width:0}
 .ai-out{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#fff;max-height:52vh;overflow:auto;font-size:14px;line-height:1.55}
 .ai-out h3{margin:12px 0 4px}
 .ai-out ul{padding-left:20px;margin:4px 0}
+
+/* ===== Tema: kurumsal / altyapı ===== */
+h1,h2,h3{font-family:var(--f-d);letter-spacing:-.005em}
+h1{font-size:25px;font-weight:600} h2{font-size:18px;font-weight:600} h3{font-weight:600}
+.side{background:var(--side);border-right:1px solid #1d2230;color:var(--sidet)}
+.brand b{color:#fff;font-family:var(--f-d);font-weight:600;letter-spacing:.01em}
+.brand small{color:#6f778a;font-family:var(--f-m);font-size:11px;letter-spacing:.02em}
+.brand .logo{border-radius:6px;background:linear-gradient(135deg,#5b2fd4,#1c5fdc)}
+.nav{color:var(--sidet);border-radius:6px;position:relative}
+.nav:hover{background:var(--side2);color:#fff}
+.nav.on{background:var(--side2);color:#fff;box-shadow:none}
+.nav.on::before{content:"";position:absolute;left:-14px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:#7c5cff}
+.nav .pill{background:var(--red)}
+.side .foot{color:#6f778a;border-top:1px solid #1d2230;padding-top:12px}
+.card,.lib-card,.sitem,.handout,.hx,.ai-out{border-radius:var(--r)}
+.card{box-shadow:none}
+.btn{border-radius:6px;font-weight:600}
+.btn.sm{border-radius:5px}
+.btn.pri{background:var(--teal);border-color:var(--teal)}
+.btn.clay{background:var(--clay);border-color:var(--clay)}
+input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{border-radius:6px}
+.chip{border-radius:6px}
+.chip.on{background:var(--ink);border-color:var(--ink)}
+.tag{border-radius:4px;font-weight:600;letter-spacing:.02em}
+.tabs{border-bottom:1px solid var(--line)}
+.tab.on{color:var(--teal);border-color:var(--teal)}
+.lib-card:hover{border-color:var(--teal);transform:none;box-shadow:0 0 0 3px rgba(91,47,212,.08)}
+.det h3{color:var(--teal);font-size:12.5px;letter-spacing:.09em}
+.note{border-radius:6px}
+.note.warn{background:var(--red2);color:#8f1020;border-left:3px solid var(--red)}
+.note.info{background:var(--clay2);color:#123f99;border-left:3px solid var(--clay)}
+.note.gold{border-left:3px solid var(--gold)}
+.modal{border-radius:10px}
+.toast{border-radius:6px}
+.stat b,.timer,.an-olcu b{font-family:var(--f-m);font-weight:500;letter-spacing:-.02em}
+table th{font-family:var(--f-m);font-size:11px;letter-spacing:.06em}
+.avatar{border-radius:6px;background:var(--teal2);color:var(--teal)}
+.pnum{border-radius:5px}
+.check{border-radius:4px}
+.head h1::before{content:"";display:inline-block;width:8px;height:8px;background:var(--teal);margin-right:10px;vertical-align:middle;border-radius:2px;transform:translateY(-2px)}
+@media (max-width:860px){.side{border-top:1px solid #1d2230}.nav.on::before{left:25%;right:25%;top:-6px;bottom:auto;width:auto;height:3px;border-radius:0 0 3px 3px}}
+.tag.orto{background:var(--clay2);color:var(--orto)}
+.lib-card>.tag,.lib-card .tag{align-self:flex-start}
+.brand small{white-space:nowrap;font-size:10.5px}
 </style></head><body><div id="root"></div><script>
 // ===== TEDAVİ YÖNTEMLERİ =====
 const YONTEM_KAT = {
@@ -3023,11 +3068,11 @@ function arcSVG(c, p1, p2, r, label, col, X){
   const e1 = [c[0] + r * Math.cos(a1), c[1] + r * Math.sin(a1)], e2 = [c[0] + r * Math.cos(a1 + d), c[1] + r * Math.sin(a1 + d)];
   const mid = a1 + d / 2, lp = [c[0] + (r + 8) * Math.cos(mid), c[1] + (r + 8) * Math.sin(mid)];
   const [x1, y1] = X(e1), [x2, y2] = X(e2), [lx, ly] = X(lp);
-  return `<path d="M${x1} ${y1} A${r} ${r} 0 0 ${d > 0 ? 0 : 1} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width=".7"/><text x="${lx}" y="${ly}" font-size="4.6" text-anchor="middle" dominant-baseline="middle" fill="#1c2626" font-weight="600">${label}</text>`;
+  return `<path d="M${x1} ${y1} A${r} ${r} 0 0 ${d > 0 ? 0 : 1} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width=".7"/><text x="${lx}" y="${ly}" font-size="4.6" text-anchor="middle" dominant-baseline="middle" fill="#0d1017" font-weight="600">${label}</text>`;
 }
 function figSag(R, X, ghost, a){
   const p = R.pts, L = (q1, q2, w, c, o = 1) => { const [x1, y1] = X(q1), [x2, y2] = X(q2); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" opacity="${o}"/>`; };
-  const ink = ghost ? "#9aa5a3" : "#1c2626", far = ghost ? "#c9cfcd" : "#8a9593", w = ghost ? 1.1 : 1.8;
+  const ink = ghost ? "#9aa1b0" : "#0d1017", far = ghost ? "#c9cfcd" : "#7a8191", w = ghost ? 1.1 : 1.8;
   let s = "";
   s += L(p.hip, p.B.knee, w, far) + L(p.B.knee, p.B.ankle, w, far) + L(p.B.heel, p.B.toe, w, far) + L(p.B.ankle, p.B.heel, w * .7, far);
   s += L(p.hip, p.sh, w + .3, ink) + L(p.sh, p.elbow, w * .8, ink) + L(p.elbow, p.hand, w * .8, ink);
@@ -3035,13 +3080,13 @@ function figSag(R, X, ghost, a){
   const [hx, hy] = X(p.head); s += `<circle cx="${hx}" cy="${hy}" r="${ghost ? 9 : 9}" fill="${ghost ? "none" : "#fff"}" stroke="${ink}" stroke-width="${w}"/>`;
   if (!ghost){
     [p.hip, p.A.knee].forEach(q => { const [x, y] = X(q); s += `<circle cx="${x}" cy="${y}" r="2.6" fill="#fff" stroke="#b3264a" stroke-width=".8"/><circle cx="${x}" cy="${y}" r=".9" fill="#b3264a"/>`; });
-    [p.A.ankle, p.hand, p.A.toe].forEach(q => { const [x, y] = X(q); s += `<circle cx="${x}" cy="${y}" r="1.2" fill="#1c2626"/>`; });
+    [p.A.ankle, p.hand, p.A.toe].forEach(q => { const [x, y] = X(q); s += `<circle cx="${x}" cy="${y}" r="1.2" fill="#0d1017"/>`; });
   }
   return s;
 }
 function figFront(R, X, ghost){
   const p = R.pts, L = (q1, q2, w, c) => { const [x1, y1] = X(q1), [x2, y2] = X(q2); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`; };
-  const ink = ghost ? "#9aa5a3" : "#1c2626", w = ghost ? 1.1 : 1.8;
+  const ink = ghost ? "#9aa1b0" : "#0d1017", w = ghost ? 1.1 : 1.8;
   let s = L(p.hipL, p.hipR, w, ink) + L(p.c, p.shc, w + .3, ink) + L(p.shL, p.shR, w, ink) + L(p.shL, p.handL, w * .8, ink) + L(p.shR, p.handR, w * .8, ink);
   ["L", "R"].forEach(k => { const hip = k === "L" ? p.hipL : p.hipR, g = p[k], sg = k === "L" ? -1 : 1; s += L(hip, g.knee, w, ink) + L(g.knee, g.ankle, w, ink) + L(g.ankle, [g.ankle[0], g.ankle[1] - 7], w, ink) + L([g.ankle[0] - 4, g.ankle[1] - 8], [g.ankle[0] + 4, g.ankle[1] - 8], w, ink); });
   const [hx, hy] = X(p.head); s += `<circle cx="${hx}" cy="${hy}" r="9" fill="${ghost ? "none" : "#fff"}" stroke="${ink}" stroke-width="${w}"/>`;
@@ -3053,17 +3098,17 @@ function anSVG(a, R, G){
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-height:460px" font-family="var(--f-b)">`;
   const fy = X([0, 0])[1];
   // zemin ve cetvel
-  s += `<line x1="4" y1="${fy}" x2="${W - 4}" y2="${fy}" stroke="#1c2626" stroke-width=".5"/>`;
-  for (let x = Math.ceil(xmin / 10) * 10; x < xmin + W; x += 10){ const [sx] = X([x, 0]); s += `<line x1="${sx}" y1="${fy}" x2="${sx}" y2="${fy + (x % 50 === 0 ? 3 : 1.6)}" stroke="#8a9593" stroke-width=".35"/>`; }
-  s += `<line x1="${W / 2 - 50}" y1="${fy + 9}" x2="${W / 2 + 50}" y2="${fy + 9}" stroke="#1c2626" stroke-width=".4"/><line x1="${W / 2 - 50}" y1="${fy + 7.5}" x2="${W / 2 - 50}" y2="${fy + 10.5}" stroke="#1c2626" stroke-width=".4"/><line x1="${W / 2 + 50}" y1="${fy + 7.5}" x2="${W / 2 + 50}" y2="${fy + 10.5}" stroke="#1c2626" stroke-width=".4"/><text x="${W / 2 + 53}" y="${fy + 10}" font-size="4">1 m</text>`;
+  s += `<line x1="4" y1="${fy}" x2="${W - 4}" y2="${fy}" stroke="#0d1017" stroke-width=".5"/>`;
+  for (let x = Math.ceil(xmin / 10) * 10; x < xmin + W; x += 10){ const [sx] = X([x, 0]); s += `<line x1="${sx}" y1="${fy}" x2="${sx}" y2="${fy + (x % 50 === 0 ? 3 : 1.6)}" stroke="#7a8191" stroke-width=".35"/>`; }
+  s += `<line x1="${W / 2 - 50}" y1="${fy + 9}" x2="${W / 2 + 50}" y2="${fy + 9}" stroke="#0d1017" stroke-width=".4"/><line x1="${W / 2 - 50}" y1="${fy + 7.5}" x2="${W / 2 - 50}" y2="${fy + 10.5}" stroke="#0d1017" stroke-width=".4"/><line x1="${W / 2 + 50}" y1="${fy + 7.5}" x2="${W / 2 + 50}" y2="${fy + 10.5}" stroke="#0d1017" stroke-width=".4"/><text x="${W / 2 + 53}" y="${fy + 10}" font-size="4">1 m</text>`;
   // ekipman
   if (a.cfg.chair){ const [x1, y1] = X([-62, 43]), [x2] = X([-22, 43]), [, y0] = X([0, 0]), [xb, yb] = X([-62, 90]);
-    s += `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="2.4" fill="#d9d2c4"/><line x1="${x1 + 2}" y1="${y1}" x2="${x1 + 2}" y2="${y0}" stroke="#bdb5a5" stroke-width="1"/><line x1="${x2 - 2}" y1="${y1}" x2="${x2 - 2}" y2="${y0}" stroke="#bdb5a5" stroke-width="1"/><line x1="${xb + 1}" y1="${yb}" x2="${xb + 1}" y2="${y1}" stroke="#bdb5a5" stroke-width="1.4"/>`; }
-  if (a.cfg.box){ const ax = a.cfg.x0; const [x1, y1] = X([ax - 12, a.cfg.box]), [x2, y2] = X([ax + 40, 0]); s += `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="#e8e1d3" stroke="#bdb5a5" stroke-width=".5"/>`; }
+    s += `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="2.4" fill="#d9d2c4"/><line x1="${x1 + 2}" y1="${y1}" x2="${x1 + 2}" y2="${y0}" stroke="#b8bdc9" stroke-width="1"/><line x1="${x2 - 2}" y1="${y1}" x2="${x2 - 2}" y2="${y0}" stroke="#b8bdc9" stroke-width="1"/><line x1="${xb + 1}" y1="${yb}" x2="${xb + 1}" y2="${y1}" stroke="#b8bdc9" stroke-width="1.4"/>`; }
+  if (a.cfg.box){ const ax = a.cfg.x0; const [x1, y1] = X([ax - 12, a.cfg.box]), [x2, y2] = X([ax + 40, 0]); s += `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="#e8e1d3" stroke="#b8bdc9" stroke-width=".5"/>`; }
   if (a.cfg.omuz){ const [x1, y1] = X([xmin + 4, 0]); s += `<rect x="${x1}" y="${y1 - 1.5}" width="${W - 8}" height="1.5" fill="#e2efe9"/>`; }
   // kalça yüksekliği kılavuzu
   const hipP = a.gorunum === "front" ? R.pts.c : R.pts.hip, [hx, hy] = X(hipP);
-  s += `<path d="M${hx} ${hy} H8 V${fy}" fill="none" stroke="#8a9593" stroke-width=".35" stroke-dasharray="1.4 1.2"/><text x="9.5" y="${hy - 2}" font-size="4" fill="#4c5a58">${Math.round(R.m.kalcaY)} cm</text>`;
+  s += `<path d="M${hx} ${hy} H8 V${fy}" fill="none" stroke="#7a8191" stroke-width=".35" stroke-dasharray="1.4 1.2"/><text x="9.5" y="${hy - 2}" font-size="4" fill="#4c5a58">${Math.round(R.m.kalcaY)} cm</text>`;
   if (G) s += a.gorunum === "front" ? figFront(G, X, true) : figSag(G, X, true, a);
   if (a.gorunum === "front"){
     s += figFront(R, X, false);
@@ -3320,7 +3365,7 @@ function vPanel(){
   <div class="row"><button class="btn" data-go="kutuphane">${ic("book")} Kütüphane</button><button class="btn pri" data-act="new-patient">${ic("plus")} Yeni hasta</button></div></div>
   ${aktif ? `<div class="note info row" style="margin-bottom:14px"><b>Devam eden seans:</b> ${esc(aktif.ad)} <span class="sp"></span><button class="btn sm pri" data-go="seans">Seansa dön</button></div>` : ""}
   ${!storageOk ? `<div class="note warn" style="margin-bottom:14px">Bu tarayıcıda kalıcı depolama kullanılamıyor; veriler sayfa kapanınca kaybolabilir. Ayarlar'dan yedek indirin.</div>` : ""}
-  ${(() => { const due = DB.hastalar.filter(h => ["zaman", "yok"].includes(evalStatus(h).durum) && (h.seanslar || []).length); return due.length ? `<div class="card" style="margin-bottom:14px;border-color:#efcdb9"><div class="sec-t"><h2>Değerlendirme bekleyenler</h2></div><div class="list">${due.map(h => { const st = evalStatus(h); return `<div class="li" data-act="batch-eval" data-hid="${h.id}"><div class="avatar" style="background:var(--clay2);color:var(--clay)">${esc(initials(h.ad))}</div><div class="sp"><div class="t">${esc(h.ad)}</div><div class="s">${st.durum === "yok" ? "Başlangıç değerlendirmesi yok" : "Son değerlendirme " + fmtDate(st.son)}</div></div><span class="btn sm">Değerlendir</span></div>`; }).join("")}</div></div>` : ""; })()}
+  ${(() => { const due = DB.hastalar.filter(h => ["zaman", "yok"].includes(evalStatus(h).durum) && (h.seanslar || []).length); return due.length ? `<div class="card" style="margin-bottom:14px;border-color:#c4d6fa"><div class="sec-t"><h2>Değerlendirme bekleyenler</h2></div><div class="list">${due.map(h => { const st = evalStatus(h); return `<div class="li" data-act="batch-eval" data-hid="${h.id}"><div class="avatar" style="background:var(--clay2);color:var(--clay)">${esc(initials(h.ad))}</div><div class="sp"><div class="t">${esc(h.ad)}</div><div class="s">${st.durum === "yok" ? "Başlangıç değerlendirmesi yok" : "Son değerlendirme " + fmtDate(st.son)}</div></div><span class="btn sm">Değerlendir</span></div>`; }).join("")}</div></div>` : ""; })()}
   <div class="grid g4">
     <div class="card stat"><b>${DB.hastalar.length}</b><span>Kayıtlı hasta</span></div>
     <div class="card stat"><b>${bugun}</b><span>Bugünkü seans</span></div>
@@ -3438,7 +3483,7 @@ function spark(arr, sc){
   const mn = Math.min(...vals), mx = Math.max(...vals), r = mx - mn || 1;
   const pts = vals.map((v, i) => `${(i / (vals.length - 1)) * (w - 6) + 3},${h - 4 - ((v - mn) / r) * (h - 8)}`).join(" ");
   const good = sc.yon === 0 ? null : (vals.at(-1) - vals[0]) * sc.yon > 0;
-  const col = good === null ? "#8a9593" : good ? "#2e7d4f" : vals.at(-1) === vals[0] ? "#8a9593" : "#b3261e";
+  const col = good === null ? "#7a8191" : good ? "#14804a" : vals.at(-1) === vals[0] ? "#7a8191" : "#d01b2f";
   return `<svg class="spark" width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>${vals.map((v, i) => `<circle cx="${(i / (vals.length - 1)) * (w - 6) + 3}" cy="${h - 4 - ((v - mn) / r) * (h - 8)}" r="2.2" fill="${col}"/>`).join("")}</svg>`;
 }
 function anlamBadge(sc, d, n){
@@ -3660,14 +3705,14 @@ function picker(title, items, groups, onPick, onClose){
 function handoutHTML(p, standalone = false){
   const g = p.program;
   const ex = g.ev.map((x, i) => { const e = E(x.eid); if (!e) return ""; const dose = [x.set ? `${x.set} set` : "", x.tekrar ? `${x.tekrar} tekrar` : "", x.tut ? `${x.tut}` : "", x.siklik].filter(Boolean);
-    const dd = EXD[e.id]; return `<div class="hx"><b>${i + 1}. ${esc(e.ad)}</b>${dd ? `<div style="font-size:13px;color:#4c5a58;margin-top:2px">Amaç: ${esc(dd.amac)}</div>` : ""}<ol>${e.adim.map(a => `<li>${esc(a)}</li>`).join("")}</ol><div class="hdose">${dose.map(d => `<span>• ${esc(d)}</span>`).join("")}</div>${x.not ? `<div style="margin-top:4px"><i>${esc(x.not)}</i></div>` : ""}${dd && dd.hata.length ? `<div style="margin-top:6px;font-size:13px"><b>Sık yapılan hatalar:</b><ul style="margin:2px 0 0;padding-left:18px">${dd.hata.slice(0, 2).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>` : ""}${e.dikkat ? `<div style="margin-top:4px;color:#b8572f">⚠ ${esc(e.dikkat)}</div>` : ""}</div>`; }).join("");
-  const inner = `<div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:2px solid #0d6556;padding-bottom:12px;margin-bottom:14px"><div><h1 style="margin:0;font-family:Georgia,serif;color:#0d6556">Ev Egzersiz Programı</h1><div style="margin-top:4px">${esc(p.ad)} · ${fmtDate(today())}</div></div><div style="text-align:right;font-size:13px">${esc(DB.ayar.terapist || "")}<br>${esc(DB.ayar.unvan || "")}${DB.ayar.klinik ? "<br>" + esc(DB.ayar.klinik) : ""}</div></div>
+    const dd = EXD[e.id]; return `<div class="hx"><b>${i + 1}. ${esc(e.ad)}</b>${dd ? `<div style="font-size:13px;color:#3b4250;margin-top:2px">Amaç: ${esc(dd.amac)}</div>` : ""}<ol>${e.adim.map(a => `<li>${esc(a)}</li>`).join("")}</ol><div class="hdose">${dose.map(d => `<span>• ${esc(d)}</span>`).join("")}</div>${x.not ? `<div style="margin-top:4px"><i>${esc(x.not)}</i></div>` : ""}${dd && dd.hata.length ? `<div style="margin-top:6px;font-size:13px"><b>Sık yapılan hatalar:</b><ul style="margin:2px 0 0;padding-left:18px">${dd.hata.slice(0, 2).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>` : ""}${e.dikkat ? `<div style="margin-top:4px;color:#1c5fdc">⚠ ${esc(e.dikkat)}</div>` : ""}</div>`; }).join("");
+  const inner = `<div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:2px solid #5b2fd4;padding-bottom:12px;margin-bottom:14px"><div><h1 style="margin:0;font-family:Helvetica,Arial,sans-serif;color:#5b2fd4">Ev Egzersiz Programı</h1><div style="margin-top:4px">${esc(p.ad)} · ${fmtDate(today())}</div></div><div style="text-align:right;font-size:13px">${esc(DB.ayar.terapist || "")}<br>${esc(DB.ayar.unvan || "")}${DB.ayar.klinik ? "<br>" + esc(DB.ayar.klinik) : ""}</div></div>
   ${g.hedefler.filter(h => h.vade === "kisa").length ? `<p style="margin:0 0 6px"><b>Hedeflerimiz:</b> ${g.hedefler.filter(h => h.vade === "kisa").slice(0, 3).map(h => esc(h.metin.replace(/\.$/, ""))).join("; ")}.</p>` : ""}
-  ${g.evNot ? `<div style="background:#f8e7dd;color:#7a3417;padding:10px 14px;border-radius:8px;margin:10px 0">${esc(g.evNot)}</div>` : ""}
+  ${g.evNot ? `<div style="background:#e7effd;color:#123f99;padding:10px 14px;border-radius:8px;margin:10px 0">${esc(g.evNot)}</div>` : ""}
   ${ex || "<p>Egzersiz eklenmemiş.</p>"}
   <p style="font-size:12px;color:#666;margin-top:16px">Egzersizler sırasında göğüs ağrısı, ani nefes darlığı, baş dönmesi veya artan ağrı/uyuşma olursa durun ve fizyoterapistinize haber verin.</p>`;
   if (!standalone) return `<div class="handout">${inner}</div>`;
-  return `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ev Egzersiz Programı – ${esc(p.ad)}</title><style>body{font-family:-apple-system,"Segoe UI",Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#1c2626;font-size:14px;line-height:1.5}.hx{border:1px solid #ddd;border-radius:10px;padding:12px 14px;margin:10px 0;break-inside:avoid}.hx ol{margin:6px 0 4px;padding-left:20px}.hdose{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#0d6556;font-weight:600}.pb{position:fixed;top:12px;right:12px;padding:8px 14px;border-radius:8px;border:0;background:#0d6556;color:#fff;font-size:14px;cursor:pointer}@media print{.pb{display:none}body{margin:0}}</style></head><body><button class="pb" onclick="window.print()">Yazdır / PDF</button>${inner}</body></html>`;
+  return `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ev Egzersiz Programı – ${esc(p.ad)}</title><style>body{font-family:-apple-system,"Segoe UI",Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#1c2626;font-size:14px;line-height:1.5}.hx{border:1px solid #ddd;border-radius:10px;padding:12px 14px;margin:10px 0;break-inside:avoid}.hx ol{margin:6px 0 4px;padding-left:20px}.hdose{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#5b2fd4;font-weight:600}.pb{position:fixed;top:12px;right:12px;padding:8px 14px;border-radius:8px;border:0;background:#5b2fd4;color:#fff;font-size:14px;cursor:pointer}@media print{.pb{display:none}body{margin:0}}</style></head><body><button class="pb" onclick="window.print()">Yazdır / PDF</button>${inner}</body></html>`;
 }
 function handoutText(p){
   const g = p.program;
