@@ -229,6 +229,42 @@ table th{font-family:var(--f-m);font-size:11px;letter-spacing:.06em}
 .brand small{white-space:nowrap;font-size:10.5px}
 .brand .logo{background:none;width:34px;height:34px;padding:0;border:1px solid #262b3a;border-radius:9px;overflow:hidden}
 .brand .logo svg{display:block}
+/* ===== Eklentiler: senkron, muayene, grafik, takvim ===== */
+.sync-chip{display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:8px 10px;border-radius:6px;border:1px solid #262b3a;background:transparent;color:var(--sidet);font:500 12px var(--f-b);cursor:pointer;text-align:left;width:100%}
+.sync-chip svg{width:16px;height:16px;flex:none}
+.sync-chip:hover{background:var(--side2);color:#fff}
+.sync-chip.ok svg{color:#3ccf86}.sync-chip.warn svg{color:#ffb547}.sync-chip.run svg{color:#8b6cff;animation:pls 1s infinite alternate}
+@keyframes pls{from{opacity:.4}to{opacity:1}}
+.mu-sec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px}
+.mu-sec>summary::-webkit-details-marker{display:none}
+.mu-sec>summary::before{content:"▸";color:var(--teal);font-size:14px;transition:transform .15s}
+.mu-sec[open]>summary::before{transform:rotate(90deg)}
+.mu-sec>summary h2{margin:0}
+.mu-t td,.mu-t th{padding:5px 8px}
+select.mu,input.mu{padding:4px 6px;font-size:13px;height:30px}
+select.mu.ok{background:#eef8f2}select.mu.mid{background:#fdf3df}select.mu.bad{background:var(--red2)}
+select.mu.chg,input.mu.chg{outline:2px solid #7c5cff;outline-offset:1px}
+.mu-chg-ornek{outline:2px solid #7c5cff;padding:0 4px;border-radius:3px}
+.stat-mini{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+.stat-mini b{display:block;font-family:var(--f-m);font-size:22px;font-weight:500}
+.stat-mini b small{font-size:12px;color:var(--mute);margin-left:2px}
+.stat-mini span{font-size:12px;color:var(--mute)}
+.tbl-scroll{overflow-x:auto}
+.gcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff;cursor:pointer}
+.gcard:hover{border-color:var(--teal)}
+.takvim{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.tg{background:#fff;border:1px solid var(--line);border-radius:8px;min-height:220px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.tg.bugun{border-color:var(--teal);box-shadow:0 0 0 2px rgba(91,47,212,.12)}
+.tg-h{display:flex;align-items:center;gap:6px;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.tg-h span{color:var(--mute);font-family:var(--f-m);font-size:12px}
+.tg-h .icon-btn{margin-left:auto;width:24px;height:24px}
+.tg.bugun .tg-h b{color:var(--teal)}
+.rv{border-left:3px solid var(--teal);background:var(--teal2);border-radius:5px;padding:6px 8px;cursor:pointer;position:relative}
+.rv:hover{filter:brightness(.97)}
+.rv.geldi{border-color:var(--green);background:var(--green2)}.rv.gelmedi{border-color:var(--red);background:var(--red2)}.rv.iptal{opacity:.5;text-decoration:line-through}
+.rv-s{font-family:var(--f-m);font-size:11px;color:var(--ink2)}.rv-a{font-weight:600;font-size:13px;line-height:1.25}.rv-n{font-size:11px;color:var(--mute)}
+.rv-d{position:absolute;top:5px;right:6px;font-size:10px;font-weight:600;color:var(--ink2)}
+@media (max-width:860px){.sync-chip{display:none}.takvim{grid-template-columns:1fr}.tg{min-height:0}.tg-bos{display:none}.hide-m{display:none}}
 </style></head><body><div id="root"></div><script>
 // ===== TEDAVİ YÖNTEMLERİ =====
 const YONTEM_KAT = {
@@ -2833,6 +2869,142 @@ const COND_TEST = {
  c_down:["t_beighton"], c_ampute:["t_thomas"], c_lenfodem:["t_wells"]
 };
 
+// ===== KAYNAKLAR (6. paket): ek nörolojik, romatizmal, ortopedik durumlar + kardiyopulmoner ölçümler =====
+const GK = s => `Güncel klinik kılavuzlara dayalı özet: ${s}.`;
+CONDITIONS.push(
+{id:"c_mg", ad:"Myastenia Gravis", alan:"noro",
+ ozet:"Nöromüsküler kavşakta asetilkolin reseptörlerine karşı otoimmün hastalık. Tekrarlayan kullanımla artan, dinlenmeyle düzelen güçsüzlük; pitoz, diplopi, bulber tutulum (yutma, konuşma), proksimal ve solunum kası güçsüzlüğü.",
+ olcek:["s_mmt","s_6dyt","s_borg","s_kavrama","s_mip","s_fim"],
+ hedefKisa:["Yorgunluğu artırmadan kuvvet ve dayanıklılığın korunması","Enerji koruma ve aktivite temposu","Solunum kası fonksiyonunun izlenmesi"],
+ hedefUzun:["Günlük yaşamda bağımsızlık","Krizlerin erken tanınması (eğitim)"],
+ yontem:["m_enerji","m_aerobik","m_pre","m_imt","m_solunum","m_egitim"],
+ egz:["e_yuruyus_aerobik","e_bisiklet","e_otur_kalk","e_omuz_kurek_cekme","e_diyafram_nefes","e_insentif"],
+ evreler:[],
+ dikkat:["Egzersiz ilacın (piridostigmin) etkisinin en yüksek olduğu saatlere (ilaçtan ~1–2 saat sonra) planlanır; sabah saatleri genellikle daha iyidir.","Düşük-orta yoğunluk, kısa setler ve sık dinlenme; ‘ertesi gün yorgunluk’ dozun fazla olduğunu gösterir.","Isı, enfeksiyon, stres ve bazı ilaçlar semptomları artırır; sıcak ortamda egzersizden kaçınılır.","Myastenik kriz belirtileri (artan nefes darlığı, yutma güçlüğü, konuşmada bozulma, öksürememe) → acil yönlendirme. MIP düşüşü solunum kası tutulumunu gösterir."],
+ kaynak:GK("myastenia gravis'te egzersiz – düşük-orta yoğunluklu aerobik ve kuvvet eğitimi güvenli ve yararlıdır (Westerberg 2017; Naumes 2022)")},
+{id:"c_cmt", ad:"Charcot-Marie-Tooth (HMSN)", alan:"noro",
+ ozet:"Kalıtsal motor-duyu nöropatisi; distalden proksimale ilerleyen güçsüzlük ve atrofi (‘ters şişe’ bacak), pes kavus, çekiç parmak, düşük ayak, duyu kaybı, denge bozukluğu; ellerde intrinsik zayıflık.",
+ olcek:["s_mmt","s_eha","s_10m","s_6dyt","s_berg","s_kavrama","s_fga"],
+ hedefKisa:["Ayak bileği dorsifleksiyon EHA'sının korunması","Distal kuvvet ve dengenin geliştirilmesi","Uygun ortez (AFO) ile güvenli yürüme"],
+ hedefUzun:["Toplum içi ambulasyon","El fonksiyonunun korunması","Deformite ilerlemesinin yavaşlatılması"],
+ yontem:["m_germe","m_pre","m_noromuskuler","m_ortez","m_aerobik","m_enerji","m_hidro"],
+ egz:["e_baldir_germe","e_ayak_dorsi_aktif","e_topuk_kaldirma","e_tek_ayak","e_denge_minder","e_el_kavrama","e_parmak_ince","e_bisiklet"],
+ evreler:[],
+ dikkat:["Aşırı yorgunluk yaratan yüksek dirençli eksantrik egzersizden kaçınılır; submaksimal kuvvet eğitimi güvenlidir.","Duyu kaybı nedeniyle ayak bakımı, ayakkabı ve ortez basıları her seans kontrol edilir.","Gece ayak bileği splinti ve düzenli gastroknemius-soleus germe kontraktürü yavaşlatır."],
+ kaynak:GK("kalıtsal nöropatilerde fizyoterapi – germe, ortez, submaksimal kuvvet ve denge eğitimi")},
+{id:"c_nbh", ad:"Normal Basınçlı Hidrosefali (yetişkin)", alan:"noro",
+ ozet:"Yaşlıda yürüme bozukluğu (geniş tabanlı, ‘ayakları yere yapışık’, küçük adımlı), bilişsel yavaşlama ve idrar inkontinansı üçlüsü. Lomber ponksiyon (tap) testi öncesi-sonrası yürüme ölçümleri şant kararında kullanılır.",
+ olcek:["s_10m","s_tug","s_berg","s_fga","s_5tsts"],
+ hedefKisa:["Güvenli yürüme ve transferler","Düşme riskinin azaltılması"],
+ hedefUzun:["Şant sonrası yürüme kapasitesinin en üst düzeye çıkarılması","Bağımsız toplum içi mobilite"],
+ yontem:["m_gorev","m_noromuskuler","m_aerobik","m_egitim"],
+ egz:["e_ritmik_yuruyus","e_buyuk_amplitud","e_agirlik_aktarma","e_otur_kalk","e_yuruyus_engel","e_tandem"],
+ evreler:[{ad:"Tap testi değerlendirmesi", icerik:"Ponksiyon öncesi ve 2–4 saat / 24 saat sonra 10 m yürüme (süre ve adım sayısı), TUG ve bir dönüş görevi. Yürüme hızında ≥ %20 iyileşme olumlu yanıt olarak kabul edilir (merkeze göre değişir)."},{ad:"Şant sonrası", icerik:"Yürüme eğitimi, denge, kuvvet; şant disfonksiyonu belirtileri için izlem."}],
+ dikkat:["Şant sonrası baş ağrısı, kusma, bilinç değişikliği, yürümede yeniden kötüleşme → şant disfonksiyonu açısından ekibe bildir.","Parkinsonizmden farkı: kol salınımı genellikle korunur, ipuçlarına yanıt sınırlıdır."],
+ kaynak:GK("iNPH tanı ve izleminde yürüme testleri (Japon iNPH kılavuzu 2021)")},
+{id:"c_huntington", ad:"Huntington Hastalığı", alan:"noro",
+ ozet:"Otozomal dominant nörodejeneratif hastalık: kore, distoni, bradikinezi, denge ve yürüme bozukluğu, bilişsel ve psikiyatrik belirtiler.",
+ olcek:["s_berg","s_tug","s_10m","s_fga","s_6dyt"],
+ hedefKisa:["Denge ve yürüme güvenliği","Fiziksel aktivitenin sürdürülmesi"],
+ hedefUzun:["Fonksiyonel bağımsızlığın mümkün olduğunca korunması","Düşmelerin önlenmesi, bakım veren eğitimi"],
+ yontem:["m_aerobik","m_pre","m_gorev","m_egitim","m_enerji"],
+ egz:["e_yuruyus_aerobik","e_bisiklet","e_otur_kalk","e_agirlik_aktarma","e_tandem","e_diyafram_nefes"],
+ evreler:[{ad:"Erken", icerik:"Aerobik ve kuvvet egzersizi, aktif yaşam."},{ad:"Orta", icerik:"Denge-yürüme eğitimi, yardımcı cihaz, düşme önleme."},{ad:"Geç", icerik:"Postür, oturma sistemi, solunum ve yutma desteği, bakım veren eğitimi."}],
+ dikkat:["Bilişsel yük nedeniyle talimatlar kısa ve tek adımlı verilir; çift görev zorlaştırır.","Kore nedeniyle ekipman güvenliği ve oturma desteği gözden geçirilir."],
+ kaynak:GK("Huntington hastalığında fizyoterapi klinik pratik kılavuzu (Quinn 2020, JNPT)")},
+{id:"c_atipik_park", ad:"Atipik Parkinsonizm (PSP, MSA)", alan:"noro",
+ ozet:"Progresif supranükleer paralizi (erken geriye düşmeler, aşağı bakış kısıtlılığı, aksiyal rijidite) ve multisistem atrofi (otonom yetmezlik – ortostatik hipotansiyon, serebellar veya parkinsonyen tip). Levodopa yanıtı zayıftır, ilerleme hızlıdır.",
+ olcek:["s_berg","s_tug","s_10m","s_updrs3","s_fogq","s_abc"],
+ hedefKisa:["Düşme önleme (özellikle geriye)","Güvenli transfer ve yürüme yardımcısı seçimi","Ortostatik semptom yönetimi (MSA)"],
+ hedefUzun:["Mobilitenin olabildiğince sürdürülmesi","Bakım veren eğitimi"],
+ yontem:["m_parkinson","m_gorev","m_noromuskuler","m_egitim","m_solunum"],
+ egz:["e_agirlik_aktarma","e_otur_kalk","e_buyuk_amplitud","e_ritmik_yuruyus","e_diyafram_nefes","e_ayak_pompa"],
+ evreler:[],
+ dikkat:["PSP: ağırlık merkezi önde tutulacak şekilde ağırlıklı/önü tekerlekli yürüteç; geriye kalkış ve dönüşlerde gözetim.","MSA: seans öncesi ve ayağa kalkınca KB ölç (3 dk'da sistolik ≥ 20 / diyastolik ≥ 10 mmHg düşüş); kademeli pozisyon değişimi, bacak pompa egzersizleri, kompresyon çorabı.","Yutma bozukluğu ve aspirasyon riski açısından dil-konuşma terapisiyle iş birliği."],
+ kaynak:GK("atipik parkinsonizmde rehabilitasyon")},
+{id:"c_sle", ad:"Sistemik Lupus Eritematozus", alan:"orto",
+ ozet:"Çok sistemli otoimmün hastalık: artralji/artrit, yorgunluk, cilt (fotosensitivite), böbrek, kardiyopulmoner tutulum; atak ve remisyon dönemleri. Steroid kullanımına bağlı osteoporoz ve avasküler nekroz riski.",
+ olcek:["s_vas","s_6dyt","s_borg","s_kavrama","s_womac"],
+ hedefKisa:["Yorgunluğun ve eklem ağrısının azaltılması","Aerobik kapasitenin artırılması"],
+ hedefUzun:["İş ve sosyal yaşama katılım","Kardiyovasküler risk ve kemik sağlığının iyileştirilmesi"],
+ yontem:["m_aerobik","m_pre","m_enerji","m_hidro","m_egitim","m_germe"],
+ egz:["e_yuruyus_aerobik","e_bisiklet","e_otur_kalk","e_kopru","e_el_kavrama","e_omuz_kurek_cekme"],
+ evreler:[{ad:"Aktif atak", icerik:"EHA ve hafif aktivite, enerji koruma; yoğun egzersiz ertelenir."},{ad:"Remisyon", icerik:"Orta yoğunlukta aerobik (haftada 3–5 gün, 30 dk), progresif kuvvet."}],
+ dikkat:["Avasküler nekroz (kalçada kasık ağrısı) ve steroid miyopatisi açısından dikkat.","UV hassasiyeti: açık havada güneşten korunma.","Raynaud: soğuk ortam ve soğuk uygulamadan kaçınma."],
+ kaynak:GK("SLE'de egzersiz – yorgunluk ve aerobik kapasitede iyileşme (EULAR fiziksel aktivite önerileri 2018)")},
+{id:"c_ssc", ad:"Sistemik Skleroz (Skleroderma)", alan:"orto",
+ ozet:"Deri ve iç organlarda fibrozis: el ve yüzde deri kalınlaşması, fleksiyon kontraktürleri, Raynaud, parmak ülserleri; interstisyel akciğer hastalığı ve pulmoner hipertansiyon görülebilir.",
+ olcek:["s_eha","s_kavrama","s_dash","s_6dyt","s_mmrc"],
+ hedefKisa:["El ve ağız açıklığı EHA'sının korunması","Deri ve yumuşak doku esnekliği"],
+ hedefUzun:["El fonksiyonu ve GYA bağımsızlığı","Aerobik kapasitenin korunması"],
+ yontem:["m_germe","m_myofasyal","m_sicak","m_aerobik","m_pre","m_solunum","m_egitim"],
+ egz:["e_tendon_kaydirma","e_el_kavrama","e_parmak_ince","e_dirsek_rom","e_omuz_cubuk_fleksiyon","e_diyafram_nefes","e_yuruyus_aerobik"],
+ evreler:[],
+ dikkat:["Günlük el germeleri (MKF fleksiyonu, PİF ekstansiyonu, başparmak abdüksiyonu) ve ağız açma egzersizleri; parafin/ılık uygulama sonrası germe etkilidir.","Açık parmak ülseri üzerine germe ve bası yapılmaz.","Pulmoner tutulumda SpO₂ izlenerek egzersiz dozlanır."],
+ kaynak:GK("sistemik sklerozda el ve yüz egzersizleri ile aerobik eğitim")},
+{id:"c_jia", ad:"Juvenil İdiyopatik Artrit", alan:"ped",
+ ozet:"16 yaş öncesi başlayan, ≥ 6 hafta süren kronik artrit (oligoartiküler, poliartiküler, sistemik, entezit ilişkili vb.). Eklem ağrısı, sabah tutukluğu, kontraktür, kas zayıflığı, büyüme farklılıkları.",
+ olcek:["s_vas","s_eha","s_mmt","s_6dyt","s_gmfm"],
+ hedefKisa:["Ağrı ve tutukluğun azaltılması","Eklem hareketinin korunması (özellikle diz, el bileği)"],
+ hedefUzun:["Okul, oyun ve spora katılım","Kontraktür ve bacak boyu farkının önlenmesi"],
+ yontem:["m_hidro","m_germe","m_pre","m_aerobik","m_ortez","m_sicak","m_egitim"],
+ egz:["e_ped_hayvan_yurumesi","e_ped_hedef_atis","e_quad_set","e_dbk","e_bisiklet","e_el_kavrama","e_tendon_kaydirma"],
+ evreler:[{ad:"Aktif artrit", icerik:"Ağrısız aktif EHA, istirahat splintleri, izometrikler, su içi egzersiz."},{ad:"İnaktif dönem", icerik:"Progresif kuvvet, aerobik, spora dönüş (temaslı sporlarda dikkat)."}],
+ dikkat:["Fiziksel aktivite ve spor teşvik edilir; aktif artritte yüksek etkili yüklenmeden kaçınılır.","Servikal tutulumda (poliartiküler) boyun manipülasyonu ve zorlayıcı pozisyonlar kontrendikedir.","Üveit taraması için oftalmoloji kontrolleri hatırlatılır."],
+ kaynak:GK("JİA'da egzersiz ve fiziksel aktivite önerileri")},
+{id:"c_omuz_inst", ad:"Omuz Instabilitesi (anterior çıkık / Bankart onarımı)", alan:"orto",
+ ozet:"Travmatik anterior glenohumeral çıkık sonrası tekrarlayan instabilite riski (özellikle genç, temaslı spor yapanlarda). Konservatif ya da cerrahi (artroskopik Bankart, Latarjet) tedavi sonrası evreli rehabilitasyon.",
+ olcek:["s_vas","s_eha","s_mmt","s_dash"],
+ hedefKisa:["Ağrı kontrolü, onarımın korunması","Skapular ve rotator manşet kontrolü"],
+ hedefUzun:["Tam fonksiyonel EHA ve kuvvet","Spora dönüş (dış rotasyon/abdüksiyon pozisyonunda güven)"],
+ yontem:["m_pre","m_noromuskuler","m_stabilizasyon","m_soguk","m_bant","m_egitim"],
+ egz:["e_omuz_pendulum","e_omuz_cubuk_fleksiyon","e_skapula_retraksiyon","e_omuz_ir_band","e_omuz_dr_band","e_omuz_kurek_cekme","e_skapula_duvar_push"],
+ evreler:[{ad:"Koruma (0–6 hafta, cerrahi sonrası)", icerik:"Askı; dış rotasyon ve abdüksiyon sınırlı (cerrahın protokolüne göre, ör. 0–30° DR); pasif/aktif yardımlı EHA, skapular kontrol, izometrikler."},{ad:"Kontrollü hareket (6–12 hafta)", icerik:"Aktif EHA'nın tamamlanması, rotator manşet ve skapular kuvvet (bant), kapalı kinetik zincir."},{ad:"Kuvvet ve nöromüsküler kontrol (12–20 hafta)", icerik:"90° abdüksiyonda DR/İR kuvveti, pliometrik ve ritmik stabilizasyon."},{ad:"Spora dönüş (≥ 5–6 ay)", icerik:"Spora özgü eğitim; kriterler: tam ağrısız EHA, İR/DR kuvveti sağlam tarafın ≥ %90'ı, fonksiyonel testler, kaygı (apprehension) olmaması."}],
+ dikkat:["Erken dönemde abdüksiyon + dış rotasyon kombinasyonu (çıkık pozisyonu) zorlanmaz.","Genel eklem hipermobilitesi (Beighton) ve multidireksiyonel instabilite ayrımı yapılır."],
+ kaynak:GK("anterior omuz instabilitesi ve Bankart onarımı sonrası rehabilitasyon")},
+{id:"c_asil", ad:"Aşil Tendon Rüptürü", alan:"orto",
+ ozet:"Genellikle 30–50 yaş, ani itme hareketinde ‘arkadan tekme yemiş gibi’ ağrı. Cerrahi ya da fonksiyonel konservatif tedavide erken kontrollü yük verme ve hareket iyi sonuç verir; tendon uzaması (plantar fleksiyon gücü kaybı) en önemli risktir.",
+ olcek:["s_vas","s_eha","s_mmt","s_10m","s_cevre"],
+ hedefKisa:["Tendon boyunun korunması (aşırı dorsifleksiyondan kaçınma)","Ödem kontrolü, kademeli yük verme"],
+ hedefUzun:["Tek ayak topuk kaldırma kapasitesi","Koşu ve spora dönüş"],
+ yontem:["m_ortez","m_soguk","m_pre","m_noromuskuler","m_aerobik"],
+ egz:["e_ayak_pompa","e_quad_set","e_dbk","e_topuk_kaldirma","e_tek_ayak","e_bisiklet"],
+ evreler:[{ad:"0–2 hafta", icerik:"Topuk takozlu ortez (ekin pozisyonu), toleransa göre yük, ödem kontrolü, kalça-diz kuvveti."},{ad:"2–8 hafta", icerik:"Takozların kademeli azaltılması, ortez içinde tam yük; aktif plantar fleksiyon ve nötrale kadar dorsifleksiyon; izometrik/elastik bant."},{ad:"8–12 hafta", icerik:"Ortezden çıkış, iki ayak topuk kaldırma, bisiklet, denge."},{ad:"3–6 ay", icerik:"Tek ayak topuk kaldırmaya geçiş, eksantrik yüklenme, ~4–6. ayda koşuya başlama (kriterlere göre)."},{ad:"6–12 ay", icerik:"Sıçrama, çeviklik, spora dönüş (tek ayak topuk kaldırma tekrarında sağlam tarafın ≥ %80–90'ı)."}],
+ dikkat:["İlk 8–12 haftada pasif dorsifleksiyon germesi YAPILMAZ (tendon uzaması).","Thompson testi ile tanı; DVT riski yüksektir – baldırda ağrı-şişlik izlenir (Wells)."],
+ kaynak:GK("Aşil tendon rüptüründe erken fonksiyonel rehabilitasyon")}
+);
+// Özel testleri yeni durumlara bağla
+Object.assign(COND_TEST, {c_omuz_inst:["t_apprehension","t_sulkus","t_beighton","t_obrien"], c_asil:["t_thompson","t_wells"], c_jia:["t_beighton"], c_mg:[], c_cmt:["t_romberg"], c_atipik_park:["t_pull","t_romberg"], c_nbh:["t_romberg"], c_huntington:["t_koordinasyon"]});
+(() => { const d = (id, t) => { const c = CONDITIONS.find(x => x.id === id); if (c) c.dikkat = (c.dikkat || []).concat(t); };
+  d("c_ocb", ["Spora dönüş kriterleri (genellikle ≥ 9 ay): efüzyon yok, tam EHA, quadriceps ve hamstring kuvveti sağlam tarafın ≥ %90'ı (izokinetik/dinamometre), tek bacak sıçrama testleri (tek, üçlü, çapraz, 6 m süreli) ≥ %90, psikolojik hazırlık (ACL-RSI), spora özgü çeviklik testleri. Erken dönüş (< 9 ay) yeniden yaralanma riskini belirgin artırır.","Açık kinetik zincir diz ekstansiyonu ilk 12 haftada 90–45° aralığında (greft üzerindeki yükü sınırlamak için) uygulanabilir."]);
+  d("c_tda", ["Posterior yaklaşımda ilk 6–12 haftada kalça fleksiyonu > 90°, addüksiyon (bacak bacak üstüne atma) ve iç rotasyon kombinasyonundan kaçınılır; anterior yaklaşımda ekstansiyon + dış rotasyon sınırlanır (cerrahın tercihine göre).","Taburculuk kriterleri: bağımsız transfer, yardımcıyla güvenli yürüme ve merdiven."]);
+  d("c_tka", ["Erken dönemde hedef: 2. haftada tam ekstansiyon (0°) ve ≥ 90° fleksiyon; 6. haftada ≥ 110°. Diz altına yastık konmaz (fleksiyon kontraktürü).","Quadriceps aktivasyon kaybı (artrojenik inhibisyon) için NMES erken dönemde etkilidir."]);
+  d("c_omuz_sikisma", ["Rotator manşet tamiri sonrası (cerrahi): 0–6 hafta askı ve pasif EHA, 6–12 hafta aktif EHA, 12. haftadan sonra kuvvetlendirme; büyük yırtıklarda süreler uzar – cerrahın protokolü esastır."]); })();
+
+// ---- Kardiyopulmoner değerlendirme ölçümleri ----
+SCALES.push(
+ {id:"s_mip", ad:"Maksimal inspiratuar basınç (MIP / PImax)", kat:"Kardiyopulmoner", min:0, max:200, adim:1, birim:"cmH₂O", yon:1, yorum:"Solunum kası gücü. Yaş-cinsiyet beklenen değerinin < %70'i inspiratuar kas zayıflığı; < 60 cmH₂O inspiratuar kas eğitimi (IMT) için sık kullanılan eşik."},
+ {id:"s_mep", ad:"Maksimal ekspiratuar basınç (MEP / PEmax)", kat:"Kardiyopulmoner", min:0, max:250, adim:1, birim:"cmH₂O", yon:1, yorum:"Ekspiratuar kas gücü; < 60 cmH₂O etkisiz öksürük ile ilişkili olabilir."},
+ {id:"s_pef", ad:"Tepe ekspiratuar akım (PEF)", kat:"Kardiyopulmoner", min:0, max:800, adim:5, birim:"L/dk", yon:1, yorum:"Peak flow metre ile 3 denemenin en iyisi. Astımda kişisel en iyi değerin %80'i altı kötüleşme işaretidir."},
+ {id:"s_ock", ad:"Öksürük tepe akımı (PCF)", kat:"Kardiyopulmoner", min:0, max:800, adim:5, birim:"L/dk", yon:1, yorum:"Nöromüsküler hastalıkta < 270 L/dk öksürük desteği gerekliliği, < 160 L/dk etkisiz öksürük."},
+ {id:"s_gogus_eksp", ad:"Göğüs ekspansiyonu", kat:"Kardiyopulmoner", min:0, max:15, adim:0.5, birim:"cm", yon:1, alt:true, yorum:"Mezura ile maksimal inspirasyon–ekspirasyon farkı; aksiller, ksifoid (4.–5. kaburga) ve subkostal seviyelerde ölçülür. Not alanına seviyeyi yazın."},
+ {id:"s_fev1", ad:"FEV₁ (beklenenin %'si)", kat:"Kardiyopulmoner", min:0, max:150, adim:1, birim:"%", yon:1, yorum:"KOAH evresi (GOLD): ≥ 80 hafif, 50–79 orta, 30–49 ağır, < 30 çok ağır. Spirometri raporundan girilir."},
+ {id:"s_spo2_min", ad:"Egzersizde en düşük SpO₂", kat:"Kardiyopulmoner", min:70, max:100, adim:1, birim:"%", yon:1, yorum:"6DYT veya egzersiz sırasında. < %88 egzersiz desatürasyonu – oksijen desteği ve doz ayarı değerlendirilir; ≥ %4 düşüş anlamlı kabul edilir."}
+);
+Object.assign(SCD, {
+ s_mip:{m:"Ağızlık ve basınç ölçer (manometre), burun klipsi", t:"5–10 dk", u:["Hasta oturur, burun klipsi takılır.","Rezidüel volümden (tam nefes verdikten sonra) ağızlıktan olabildiğince güçlü ve en az 1,5 sn nefes çekmesi istenir.","Aralarda ~1 dk dinlenme; 3 tekrarlanabilir ölçümün (fark < %10) en yüksek değeri alınır (en fazla 5–8 deneme)."], p:"cmH₂O (negatif basınç mutlak değer olarak kaydedilir).", y:"Beklenen değer yaş ve cinsiyete göre hesaplanır; < %70 zayıflık. IMT reçetesinde başlangıç yükü MIP'in %30–50'si.", n:"Ağız çevresinden kaçak olmamasına dikkat; motivasyon ve teknik sonucu belirgin etkiler."},
+ s_mep:{m:"Ağızlık ve manometre, burun klipsi", t:"5 dk", u:["Total akciğer kapasitesinden (tam nefes aldıktan sonra) ağızlığa olabildiğince güçlü ve en az 1,5 sn nefes vermesi istenir.","Yanakları elle desteklenebilir; 3 tekrarlanabilir ölçümün en yükseği alınır."], p:"cmH₂O.", y:"Öksürük etkinliği ile ilişkilidir.", n:""},
+ s_pef:{m:"Peak flow metre", t:"2 dk", u:["Ayakta veya dik oturarak, gösterge sıfırda.","Derin nefes alıp ağızlığı dudaklarla sıkıca kavrar, olabildiğince hızlı ve güçlü üfler.","3 deneme yapılır, en yüksek değer kaydedilir."], p:"L/dk.", y:"Kişisel en iyi değere göre: %80–100 yeşil, %50–80 sarı, < %50 kırmızı bölge (astım eylem planı).", n:"Günlük takipte aynı saatte ölçün."},
+ s_ock:{m:"Peak flow metre + yüz maskesi veya ağızlık", t:"2 dk", u:["Hasta derin nefes alır ve maske/ağızlığa olabildiğince güçlü öksürür.","3 deneme, en yüksek değer."], p:"L/dk.", y:"< 270 L/dk: enfeksiyon döneminde öksürük desteği (manuel destek, mekanik insuflasyon-eksuflasyon); < 160 L/dk: etkisiz öksürük.", n:""},
+ s_gogus_eksp:{m:"Esnek olmayan mezura", t:"3 dk", u:["Hasta ayakta veya oturarak, kollar yanda.","Mezura aksiller seviye (3. kaburga), ksifoid seviye ve subkostal seviyede (10. kaburga) sarılır.","Maksimal ekspirasyon ve maksimal inspirasyonda çevre ölçülür; fark kaydedilir. 3 deneme, en iyisi."], p:"cm (inspirasyon – ekspirasyon).", y:"Sağlıklı erişkinde ksifoid seviyede genellikle 4–7 cm; ankilozan spondilit ve restriktif durumlarda azalır.", n:"Her ölçümde aynı seviye ve pozisyonu kullanın."},
+ s_fev1:{m:"Spirometri raporu", t:"—", u:["Spirometri raporundaki bronkodilatör sonrası FEV₁ % beklenen değerini girin.","FEV₁/FVC < 0,70 obstrüksiyonu doğrular."], p:"% beklenen.", y:"GOLD 1 ≥ 80, GOLD 2 50–79, GOLD 3 30–49, GOLD 4 < 30.", n:"Fizyoterapi ile FEV₁ genellikle belirgin değişmez; takipte 6DYT, CAT ve mMRC daha duyarlıdır."},
+ s_spo2_min:{m:"Nabız oksimetre", t:"Test sırasında", u:["6DYT veya egzersiz boyunca SpO₂ sürekli izlenir; en düşük değer kaydedilir.","Parmak soğuksa veya oje varsa okuma güvenilmez olabilir – kulak memesi probu kullanılabilir."], p:"%", y:"< %88 desatürasyon; istirahate göre ≥ %4 düşüş anlamlı.", n:"Test sırasında < %80 olursa test durdurulur."}
+});
+(() => { const add = (cid, ...s) => { const c = CONDITIONS.find(x => x.id === cid); if (c) s.forEach(k => { if (!c.olcek.includes(k)) c.olcek.push(k); }); };
+  add("c_koah", "s_mip", "s_fev1", "s_spo2_min", "s_gogus_eksp"); add("c_astim", "s_pef", "s_fev1"); add("c_bronsektazi", "s_pef", "s_ock", "s_spo2_min");
+  add("c_postop_torak", "s_mip", "s_gogus_eksp", "s_ock"); add("c_als", "s_mip", "s_ock"); add("c_dmd", "s_ock", "s_mip"); add("c_gbs", "s_mip", "s_ock");
+  add("c_as", "s_gogus_eksp"); add("c_pah", "s_spo2_min"); add("c_kalp", "s_spo2_min"); add("c_oyy", "s_mip", "s_ock"); add("c_sma", "s_ock"); })();
+
 // ================= HAREKET ANALİZİ (animasyonlu çubuk figür) =================
 const AL = {th:44, sh:43, tr:52, ua:29, fa:27};
 const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
@@ -3277,6 +3449,572 @@ function aiAyarKart(){
    <p class="small" style="margin:8px 0 0">Durum: ${esc(durum)}</p></div>`;
 }
 
+// ===== EKLENTİ KAYITLARI + GOOGLE DRIVE SENKRONU =====
+var EXT_ACT = {};
+var EXT_CHANGE_FNS = [], EXT_INPUT_FNS = [];
+function EXT_CHANGE(t, p, e){ for (const f of EXT_CHANGE_FNS){ if (f(t, p, e)) return true; } return false; }
+function EXT_INPUT(t, p, e){ for (const f of EXT_INPUT_FNS){ if (f(t, p, e)) return true; } return false; }
+
+// Drive: yalnızca GitHub sürümünde (OAuth istemcisi buseebugra88-byte.github.io için yetkili)
+const SYNC_CID = /(^|\.)github\.io$/.test(location.hostname) ? "321840054260-h70e9ug58rsoo759adndmth3fidok168.apps.googleusercontent.com" : "";
+const SYNC_KEY = "fizyoSeans.sync", SYNC_FILE = "Fizyo Seans — veri.json", SYNC_SCOPE = "https://www.googleapis.com/auth/drive.file";
+var SYNC = {bagli:false, durum:"kapali", token:null, exp:0, fileId:null, son:null, hata:"", calisiyor:false, bekleyen:false, t:null};
+var SYNC_H = null;
+(function(){ try { const s = JSON.parse(localStorage.getItem(SYNC_KEY) || "{}"); SYNC.bagli = !!s.bagli && !!SYNC_CID; SYNC.son = s.son || null; SYNC.fileId = s.fileId || null; } catch (e){} })();
+function syncKaydet(){ try { localStorage.setItem(SYNC_KEY, JSON.stringify({bagli:SYNC.bagli, son:SYNC.son, fileId:SYNC.fileId})); } catch (e){} }
+
+// ---- değişiklik izleme: her hasta / randevu / ayar için son değişiklik zamanı ----
+function hsh(str){ let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return h; }
+function kayitHash(o){ const {_m, ...r} = o; return hsh(JSON.stringify(r)); }
+function syncMark(){
+  const now = Date.now(), ilk = !SYNC_H; const yeni = {};
+  for (const p of DB.hastalar){ const h = kayitHash(p); yeni["p:" + p.id] = h; if (!ilk && SYNC_H["p:" + p.id] !== h) p._m = now; else if (!p._m) p._m = ilk ? 1 : now; }
+  for (const r of (DB.randevular = DB.randevular || [])){ const h = kayitHash(r); yeni["r:" + r.id] = h; if (!ilk && SYNC_H["r:" + r.id] !== h) r._m = now; else if (!r._m) r._m = ilk ? 1 : now; }
+  const ah = hsh(JSON.stringify(DB.ayar)); yeni.ayar = ah; if (!ilk && SYNC_H.ayar !== ah) DB._mAyar = now;
+  SYNC_H = yeni;
+}
+function syncBirlestir(L, R){
+  const sil = Object.assign({}, R.silinen || {}); for (const [k, v] of Object.entries(L.silinen || {})) sil[k] = Math.max(sil[k] || 0, v);
+  const birles = (a = [], b = []) => { const m = new Map(); for (const x of a) m.set(x.id, x); for (const x of b){ const y = m.get(x.id); if (!y || (x._m || 0) > (y._m || 0)) m.set(x.id, x); } return [...m.values()].filter(x => !(sil[x.id] && sil[x.id] >= (x._m || 0))); };
+  const out = Object.assign({}, L);
+  out.hastalar = birles(L.hastalar, R.hastalar);
+  out.randevular = birles(L.randevular, R.randevular);
+  out.silinen = sil;
+  if ((R._mAyar || 0) > (L._mAyar || 0)){ out.ayar = Object.assign({}, L.ayar, R.ayar); out._mAyar = R._mAyar; }
+  return out;
+}
+
+// ---- Google girişi ----
+let gsiYuk = null, tokenClient = null;
+function gsiLoad(){ if (gsiYuk) return gsiYuk; gsiYuk = new Promise((res, rej) => { if (window.google?.accounts?.oauth2) return res(); const s = document.createElement("script"); s.src = "https://accounts.google.com/gsi/client"; s.async = true; s.onload = () => res(); s.onerror = () => { gsiYuk = null; rej(new Error("Google girişi yüklenemedi – internet bağlantını kontrol et.")); }; document.head.appendChild(s); }); return gsiYuk; }
+function tokenAl(ilk){
+  return gsiLoad().then(() => new Promise((res, rej) => {
+    tokenClient = tokenClient || google.accounts.oauth2.initTokenClient({client_id:SYNC_CID, scope:SYNC_SCOPE, callback:() => {}});
+    tokenClient.callback = r => { if (r.error){ rej(new Error(r.error === "access_denied" ? "Google izni verilmedi." : r.error)); return; } SYNC.token = r.access_token; SYNC.exp = Date.now() + ((r.expires_in || 3600) - 60) * 1000; res(); };
+    tokenClient.error_callback = e => rej(new Error(e?.type === "popup_closed" ? "Google penceresi kapatıldı." : e?.type === "popup_failed_to_open" ? "Google penceresi açılamadı (açılır pencere engelleyiciyi kontrol et)." : "Google girişi tamamlanmadı."));
+    tokenClient.requestAccessToken({prompt: ilk ? "consent" : ""});
+  }));
+}
+const tokenGecerli = () => SYNC.token && Date.now() < SYNC.exp;
+async function gfetch(url, opt = {}){
+  const r = await fetch(url, Object.assign({}, opt, {headers:Object.assign({Authorization:"Bearer " + SYNC.token}, opt.headers || {})}));
+  if (r.status === 401){ SYNC.token = null; throw new Error("Google oturumunun süresi doldu."); }
+  if (!r.ok) throw new Error("Drive hatası (" + r.status + ")");
+  return r;
+}
+async function driveDosyaBul(){
+  if (SYNC.fileId){ try { const r = await gfetch(`https://www.googleapis.com/drive/v3/files/${SYNC.fileId}?fields=id,trashed`); const j = await r.json(); if (!j.trashed) return SYNC.fileId; } catch (e){ if (!SYNC.token) throw e; } }
+  const q = encodeURIComponent(`name='${SYNC_FILE}' and trashed=false`);
+  const j = await (await gfetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,modifiedTime)&orderBy=modifiedTime desc`)).json();
+  SYNC.fileId = j.files?.[0]?.id || null; return SYNC.fileId;
+}
+function paylasim(){ const {aktif, ...d} = DB; return JSON.stringify(Object.assign(d, {_surum:1, _yazan:navigator.userAgent.slice(0, 60), _zaman:new Date().toISOString()})); }
+async function driveYaz(){
+  const body = paylasim();
+  if (SYNC.fileId){ await gfetch(`https://www.googleapis.com/upload/drive/v3/files/${SYNC.fileId}?uploadType=media`, {method:"PATCH", headers:{"Content-Type":"application/json"}, body}); return; }
+  const b = "fs" + Date.now(), meta = JSON.stringify({name:SYNC_FILE, mimeType:"application/json", description:"Fizyo Seans uygulama verisi – elle düzenlemeyin."});
+  const j = await (await gfetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {method:"POST", headers:{"Content-Type":"multipart/related; boundary=" + b}, body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`})).json();
+  SYNC.fileId = j.id;
+}
+async function syncCalistir(etkilesim){
+  if (!SYNC_CID) return;
+  if (SYNC.calisiyor){ SYNC.bekleyen = true; return; }
+  SYNC.calisiyor = true; SYNC.hata = ""; SYNC.durum = "calisiyor"; syncCiz();
+  try {
+    if (!tokenGecerli()){
+      if (!etkilesim){ SYNC.durum = "yenile"; return; }
+      await tokenAl(!SYNC.bagli);
+    }
+    syncMark();
+    const id = await driveDosyaBul();
+    if (id){
+      const uzak = await (await gfetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`)).json();
+      const aktif = DB.aktif;
+      DB = Object.assign(syncBirlestir(DB, uzak), {aktif});
+      SYNC_H = null; syncMark();
+      try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e){}
+    }
+    await driveYaz();
+    SYNC.bagli = true; SYNC.son = new Date().toISOString(); SYNC.durum = "tamam"; syncKaydet();
+    if (!document.querySelector("#ov") && !document.activeElement?.matches?.("input,textarea,select")) render();
+  } catch (e){
+    SYNC.hata = e.message || String(e); SYNC.durum = SYNC.token ? "hata" : "yenile";
+  } finally {
+    SYNC.calisiyor = false; syncCiz();
+    if (SYNC.bekleyen){ SYNC.bekleyen = false; setTimeout(() => syncCalistir(false), 1500); }
+  }
+}
+function syncOnSave(){ if (!SYNC.bagli) return; clearTimeout(SYNC.t); SYNC.t = setTimeout(() => syncCalistir(false), 6000); }
+function syncInit(){
+  if (!SYNC_CID) return;
+  if (SYNC.bagli){ SYNC.durum = "yenile"; gsiLoad().catch(() => {}); syncCiz(); }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && SYNC.bagli && tokenGecerli()) syncCalistir(false); });
+  window.addEventListener("pagehide", () => { if (SYNC.bagli && tokenGecerli()){ clearTimeout(SYNC.t); syncCalistir(false); } });
+}
+function saatStr(iso){ if (!iso) return "—"; const d = new Date(iso); return d.toDateString() === new Date().toDateString() ? d.toTimeString().slice(0, 5) : d.toLocaleDateString("tr-TR") + " " + d.toTimeString().slice(0, 5); }
+function syncMetin(){
+  if (!SYNC_CID) return "Bu sürümde Drive senkronu yok";
+  if (!SYNC.bagli) return "Drive'a bağlı değil";
+  return ({calisiyor:"Eşitleniyor…", tamam:"Eşit · " + saatStr(SYNC.son), yenile:"Eşitlemek için dokun", hata:"Hata – tekrar dene"}[SYNC.durum]) || "Drive";
+}
+function syncChip(){
+  if (!SYNC_CID) return "";
+  const cls = SYNC.durum === "tamam" ? "ok" : SYNC.durum === "calisiyor" ? "run" : SYNC.bagli ? "warn" : "";
+  return `<button class="sync-chip ${cls}" data-act="${SYNC.bagli ? "sync-now" : "sync-connect"}" id="sync-chip" title="${esc(SYNC.hata || "Google Drive senkronu")}">${ic("cloud")}<span>${esc(syncMetin())}</span></button>`;
+}
+function syncCiz(){ const c = document.getElementById("sync-chip"); if (c) c.outerHTML = syncChip(); const m = document.getElementById("sync-msg"); if (m) m.innerHTML = syncDurumHTML(); const pn = document.getElementById("sync-panel"); if (pn) pn.outerHTML = syncPanelNot(); }
+function syncDurumHTML(){ return `${esc(syncMetin())}${SYNC.hata ? ` <span style="color:var(--red)">· ${esc(SYNC.hata)}</span>` : ""}`; }
+function syncPanelNot(){
+  if (!SYNC_CID || !SYNC.bagli || SYNC.durum !== "yenile") return `<span id="sync-panel"></span>`;
+  return `<div id="sync-panel" class="note info row" style="margin-bottom:14px"><span class="sp">${ic("cloud").replace("<svg", '<svg width="16" height="16" style="vertical-align:-3px"')} Diğer cihazlardaki değişiklikleri almak için Drive eşitlemesini başlat.</span><button class="btn sm pri" data-act="sync-now">Eşitle</button></div>`;
+}
+function syncAyarKart(){
+  if (!SYNC_CID) return `<div class="card"><h2 style="margin-bottom:6px">Google Drive senkronu</h2><p class="small muted" style="margin:0">Drive senkronu GitHub sürümünde (buseebugra88-byte.github.io/fizyo-seans – Dock'taki uygulama) çalışır. Oradaki kayıtları buraya almak için orada yedek indirip burada “Yedeği yükle”yi kullan.</p></div>`;
+  return `<div class="card"><h2 style="margin-bottom:6px">Google Drive senkronu</h2>
+   <p class="small muted" style="margin-top:0">Açıkken hastalar, ölçümler, seanslar, muayeneler ve randevular Drive'ındaki <b>“${esc(SYNC_FILE)}”</b> dosyasıyla eşitlenir; Mac'te ve telefonda aynı kayıtları görürsün. Uygulama yalnızca kendi oluşturduğu bu dosyaya erişebilir. Değişiklik yaptıktan birkaç saniye sonra Drive'a yazılır; uygulamayı açtığında diğer cihazdaki değişiklikleri almak için bir kez “Eşitle”ye dokunman gerekir (Google oturumu saatte bir yenilenir). Aynı hastayı iki cihazda aynı anda düzenlersen son kaydedilen geçerli olur.</p>
+   <div class="row">${SYNC.bagli ? `<button class="btn pri" data-act="sync-now">${ic("cloud")} Şimdi eşitle</button><button class="btn ghost" data-act="sync-off">Bağlantıyı kes</button>` : `<button class="btn pri" data-act="sync-connect">${ic("cloud")} Google Drive'a bağlan</button>`}</div>
+   <p class="small" style="margin:10px 0 0" id="sync-msg">${syncDurumHTML()}</p></div>`;
+}
+Object.assign(EXT_ACT, {
+  "sync-now": () => syncCalistir(true),
+  "sync-connect": () => syncCalistir(true),
+  "sync-off": () => confirmBox("Drive bağlantısı kesilecek. Bu cihazdaki kayıtlar kalır, Drive'daki dosya silinmez.", () => { try { if (SYNC.token) google.accounts.oauth2.revoke(SYNC.token, () => {}); } catch (e){} SYNC.bagli = false; SYNC.token = null; SYNC.durum = "kapali"; syncKaydet(); render(); toast("Drive bağlantısı kesildi"); }, "Bağlantıyı kes")
+});
+
+// ===== NÖROLOJİK MUAYENE FORMU =====
+const DERM = ["C2","C3","C4","C5","C6","C7","C8","T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12","L1","L2","L3","L4","L5","S1","S2","S3","S4-5"];
+const DERM_YER = {C2:"Oksipital çıkıntı (≥1 cm lateral)",C3:"Supraklavikular fossa",C4:"AC eklem üstü",C5:"Antekübital fossa lateral",C6:"Başparmak proksimal falanks dorsal",C7:"Orta parmak proksimal falanks dorsal",C8:"5. parmak proksimal falanks dorsal",T1:"Antekübital fossa medial",T2:"Aksilla tepesi",T3:"3. interkostal aralık",T4:"4. İKA (meme başı)",T5:"5. İKA",T6:"6. İKA (ksifoid)",T7:"7. İKA",T8:"8. İKA",T9:"9. İKA",T10:"10. İKA (göbek)",T11:"11. İKA",T12:"İnguinal ligament orta",L1:"T12 ile L2 arası",L2:"Uyluk ön-orta",L3:"Medial femoral kondil",L4:"Medial malleol",L5:"3. MTF eklem dorsal",S1:"Topuk lateral",S2:"Popliteal fossa orta",S3:"İskial tüberosite",S4:"Perianal",["S4-5"]:"Perianal bölge"};
+const ANAHTAR = [["C5","Dirsek fleksörleri"],["C6","El bileği ekstansörleri"],["C7","Dirsek ekstansörleri"],["C8","3. parmak DİF fleksörü"],["T1","5. parmak abduktörü"],["L2","Kalça fleksörleri"],["L3","Diz ekstansörleri"],["L4","Ayak bileği dorsifleksörleri"],["L5","Başparmak ekstansörü (EHL)"],["S1","Ayak bileği plantar fleksörleri"]];
+const REFL = [["cene","Çene (V)"],["biseps","Biseps (C5–6)"],["brakio","Brakioradialis (C6)"],["triseps","Triseps (C7)"],["patella","Patella (L3–4)"],["asil","Aşil (S1)"]];
+const PATO = [["babinski","Babinski"],["hoffmann","Hoffmann"],["klonusA","Ayak bileği klonusu"],["klonusP","Patellar klonus"]];
+const TON_KAS = [["omuzAdd","Omuz addüktör / iç rotatörleri"],["dirsekF","Dirsek fleksörleri"],["onkolP","Ön kol pronatörleri"],["bilekF","El bileği fleksörleri"],["parmakF","Parmak fleksörleri"],["kalcaAdd","Kalça addüktörleri"],["dizE","Diz ekstansörleri"],["dizF","Diz fleksörleri (hamstring)"],["plantarF","Ayak bileği plantar fleksörleri"]];
+const KRANIAL = [["I","Olfaktör"],["II","Optik (görme alanı, keskinlik)"],["III-IV-VI","Göz hareketleri, pupilla"],["V","Trigeminal (yüz duyusu, çiğneme)"],["VII","Fasiyal (yüz kasları)"],["VIII","Vestibulokoklear (işitme, denge)"],["IX-X","Glossofaringeal / vagus (yutma, öğürme)"],["XI","Aksesuar (SKM, trapez)"],["XII","Hipoglossal (dil)"]];
+const KOOR = [["pb","Parmak–burun",1],["td","Topuk–diz–tibia",1],["ddk","Hızlı alterne hareketler",1],["romberg","Romberg",0],["tandem","Tandem yürüme",0],["nistagmus","Nistagmus",0]];
+const SEC = {
+  duyu:[["","–"],["2","2"],["1","1"],["0","0"],["NT","NT"]],
+  mmt:[["","–"],["5","5"],["4","4"],["3","3"],["2","2"],["1","1"],["0","0"],["NT","NT"]],
+  ref:[["","–"],["0","0"],["1+","1+"],["2+","2+"],["3+","3+"],["4+","4+"]],
+  pato:[["","–"],["-","Negatif"],["+","Pozitif"],["?","Şüpheli"]],
+  mas:[["","–"],["0","0"],["1","1"],["1+","1+"],["2","2"],["3","3"],["4","4"]],
+  kr:[["","–"],["N","Normal"],["B","Bozuk"],["NT","Test edilmedi"]],
+  koor:[["","–"],["N","Normal"],["B","Bozuk"],["NT","NT"]],
+  koor0:[["","–"],["N","Negatif / normal"],["B","Pozitif / bozuk"],["NT","NT"]],
+  evh:[["","–"],["var","Var"],["yok","Yok"],["NT","NT"]],
+  ais:[["","–"],["A","A – Komplet"],["B","B – Duyu inkomplet"],["C","C – Motor inkomplet"],["D","D – Motor inkomplet"],["E","E – Normal"]]
+};
+function muYeni(p){
+  const prev = (p.muayeneler || []).at(-1);
+  const m = prev ? JSON.parse(JSON.stringify(prev)) : {duyu:{}, motor:{}, ref:{}, pato:{}, ton:{}, kr:{}, koor:{}, dap:"", vac:"", ais:"", not:"", krNot:""};
+  m.id = uid(); m.tarih = today(); m.not = prev ? "" : m.not;
+  (p.muayeneler = p.muayeneler || []).push(m); p.guncel = new Date().toISOString(); save();
+  V.muId = m.id; render(); toast(prev ? "Önceki muayene kopyalandı – değişenleri güncelle" : "Yeni muayene");
+}
+const muGet = (o, path) => path.split(".").reduce((a, k) => a == null ? undefined : a[k], o);
+function muSet(o, path, v){ const ks = path.split("."); let a = o; ks.slice(0, -1).forEach(k => { a[k] = a[k] || {}; a = a[k]; }); a[ks.at(-1)] = v; }
+function muSel(m, prev, path, opts, w = 64){
+  const v = muGet(m, path) ?? "", pv = prev ? (muGet(prev, path) ?? "") : null;
+  const ch = prev && pv !== "" && v !== "" && pv !== v;
+  const col = /^(duyu|motor)/.test(path) ? ({"2":"ok","5":"ok","1":"mid","4":"mid","3":"mid","0":"bad"}[v] || "") : path.startsWith("pato") ? (v === "+" ? "bad" : v === "-" ? "ok" : "") : path.startsWith("ton") && /mas$/.test(path) ? ({"0":"ok","1":"mid","1+":"mid","2":"bad","3":"bad","4":"bad"}[v] || "") : "";
+  return `<select class="mu ${col} ${ch ? "chg" : ""}" data-mu="${path}" style="width:${w}px" ${ch ? `title="Önceki: ${esc(pv)}"` : ""}>${opts.map(([k, l]) => `<option value="${k}" ${k === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+}
+function muNum(m, path, ph, w = 54){ return `<input type="number" class="mu" data-mu="${path}" value="${esc(muGet(m, path) ?? "")}" placeholder="${ph}" style="width:${w}px">`; }
+
+// ---- ASIA hesapları (basitleştirilmiş) ----
+function asiaHesap(m){
+  const n = v => v === "" || v == null || v === "NT" ? null : +v;
+  let uems = 0, lems = 0, eks = 0, dok = 0, ign = 0;
+  ANAHTAR.forEach(([k], i) => ["r", "l"].forEach(t => { const v = n(muGet(m, `motor.${k}.${t}`)); if (v == null){ eks++; return; } i < 5 ? uems += v : lems += v; }));
+  DERM.forEach(d => ["r", "l"].forEach(t => { const a = n(muGet(m, `duyu.${d}.${t}d`)), b = n(muGet(m, `duyu.${d}.${t}i`)); if (a == null || b == null) eks++; dok += a || 0; ign += b || 0; }));
+  const duyuSev = t => { let son = null; for (const d of DERM){ const a = muGet(m, `duyu.${d}.${t}d`), b = muGet(m, `duyu.${d}.${t}i`); if (a === "2" && b === "2") son = d; else break; } return son ? (son === "S4-5" ? "Normal (S4–5)" : son) : "—"; };
+  const motorSev = t => { let son = null; for (const [k] of ANAHTAR){ const v = n(muGet(m, `motor.${k}.${t}`)); if (v == null) break; if (v >= 3){ son = k; if (v < 5) break; } else break; } const tum5 = ANAHTAR.every(([k]) => n(muGet(m, `motor.${k}.${t}`)) === 5); return tum5 ? "Normal (S1)" : son || "—"; };
+  const s45 = ["r", "l"].some(t => ["1", "2"].includes(muGet(m, `duyu.S4-5.${t}d`)) || ["1", "2"].includes(muGet(m, `duyu.S4-5.${t}i`)));
+  const sakral = s45 || m.dap === "var" || m.vac === "var";
+  const tumS45Bos = ["r", "l"].every(t => muGet(m, `duyu.S4-5.${t}d`) === "0" && muGet(m, `duyu.S4-5.${t}i`) === "0") && m.dap === "yok" && m.vac === "yok";
+  return {uems, lems, dok, ign, eks, duyuR:duyuSev("r"), duyuL:duyuSev("l"), motorR:motorSev("r"), motorL:motorSev("l"), ais: tumS45Bos ? "A (komplet) düşündürüyor" : sakral ? "İnkomplet (B–E) – sakral korunma var" : "Sakral muayene eksik"};
+}
+function muOzet(m){
+  const a = asiaHesap(m), L = [];
+  const anorm = (grp, lbl, list, f) => { const x = list.map(([k, l]) => { const r = muGet(m, `${grp}.${k}.r`), s = muGet(m, `${grp}.${k}.l`); return f(r, s) ? `${l} (Sağ ${r || "–"} / Sol ${s || "–"})` : ""; }).filter(Boolean); if (x.length) L.push(`${lbl}: ${x.join("; ")}`); };
+  anorm("ref", "Refleks değişikliği", REFL, (r, s) => (r && r !== "2+" && r !== "1+") || (s && s !== "2+" && s !== "1+") || (r && s && r !== s));
+  anorm("pato", "Patolojik refleks", PATO, (r, s) => r === "+" || s === "+");
+  const ton = TON_KAS.map(([k, l]) => { const r = muGet(m, `ton.${k}.r.mas`), s = muGet(m, `ton.${k}.l.mas`); return (r && r !== "0") || (s && s !== "0") ? `${l} MAS Sağ ${r || "–"} / Sol ${s || "–"}` : ""; }).filter(Boolean);
+  if (ton.length) L.push("Tonus: " + ton.join("; "));
+  const kr = KRANIAL.filter(([k]) => muGet(m, `kr.${k}`) === "B").map(([k, l]) => `${k} ${l.split(" (")[0]}`);
+  if (kr.length) L.push("Kranial sinir bulgusu: " + kr.join(", ") + (m.krNot ? ` (${m.krNot})` : ""));
+  const ko = KOOR.map(([k, l, ii]) => ii ? (["B"].includes(muGet(m, `koor.${k}.r`)) || ["B"].includes(muGet(m, `koor.${k}.l`)) ? `${l} bozuk (Sağ ${muGet(m, `koor.${k}.r`) || "–"} / Sol ${muGet(m, `koor.${k}.l`) || "–"})` : "") : (muGet(m, `koor.${k}`) === "B" ? `${l} pozitif/bozuk` : "")).filter(Boolean);
+  if (ko.length) L.push("Koordinasyon/denge: " + ko.join("; "));
+  const motorVar = ANAHTAR.some(([k]) => muGet(m, `motor.${k}.r`) || muGet(m, `motor.${k}.l`)), duyuVar = DERM.some(d => muGet(m, `duyu.${d}.rd`) || muGet(m, `duyu.${d}.ld`));
+  const asia = (motorVar || duyuVar) ? `ISNCSCI: UEMS ${a.uems}/50, LEMS ${a.lems}/50, hafif dokunma ${a.dok}/112, iğne batma ${a.ign}/112; duyusal seviye Sağ ${a.duyuR} / Sol ${a.duyuL}; motor seviye Sağ ${a.motorR} / Sol ${a.motorL}${m.ais ? `; AIS ${m.ais}` : ""}` : "";
+  return {asia, satirlar:L, a};
+}
+function ptMuayene(p){
+  const list = p.muayeneler || [];
+  if (!list.length) return `<div class="card">${emptyBox("brain", "Henüz nörolojik muayene yok", `<p class="small muted" style="max-width:520px;margin:6px auto 12px">Dermatom duyu muayenesi (ASIA), anahtar kaslar, refleksler, patolojik refleksler, kas tonusu (MAS/Tardieu), kranial sinirler ve koordinasyonu tek formda kaydet. Sonraki muayeneler bir öncekinden kopyalanır; değişen hücreler işaretlenir.</p><button class="btn pri" data-act="mu-new">${ic("plus")} İlk muayeneyi başlat</button>`)}</div>`;
+  const m = list.find(x => x.id === V.muId) || list.at(-1); V.muId = m.id;
+  const idx = list.indexOf(m), prev = idx > 0 ? list[idx - 1] : null, oz = muOzet(m);
+  const th = `<th style="text-align:center">Sağ</th><th style="text-align:center">Sol</th>`;
+  const lr = (grp, key, opts, w) => `<td style="text-align:center">${muSel(m, prev, `${grp}.${key}.r`, opts, w)}</td><td style="text-align:center">${muSel(m, prev, `${grp}.${key}.l`, opts, w)}</td>`;
+  const sec = (id, title, inner, open) => `<details class="card mu-sec" ${open ? "open" : ""} data-musec="${id}"><summary><h2>${title}</h2></summary><div style="margin-top:12px">${inner}</div></details>`;
+  const acik = V.muAcik || {duyu:true, motor:true, ref:true, ton:true};
+  return `<div class="card"><div class="sec-t"><h2>Nörolojik muayene</h2><div class="row"><button class="btn sm" data-act="mu-copy" data-hid="${p.id}">${ic("copy")} Özeti kopyala</button><button class="btn sm danger ghost" data-act="mu-del">${ic("trash")}</button><button class="btn pri sm" data-act="mu-new">${ic("plus")} Yeni muayene</button></div></div>
+   <div class="chips" style="margin-bottom:10px">${list.map((x, i) => `<button class="chip ${x.id === m.id ? "on" : ""}" data-act="mu-sel" data-id="${x.id}">${i + 1}. ${fmtDate(x.tarih)}</button>`).join("")}</div>
+   <div class="row" style="gap:12px;flex-wrap:wrap"><label class="f" style="width:170px">Muayene tarihi<input type="date" data-mut="tarih" value="${m.tarih}"></label>${prev ? `<span class="small muted">Önceki muayeneyle (${fmtDate(prev.tarih)}) farklı hücreler <span class="mu-chg-ornek">mor çerçeveli</span>; üzerine gelince önceki değer görünür.</span>` : ""}</div>
+   <div class="grid g4" style="margin-top:12px">
+    <div class="stat-mini"><b>${oz.a.uems}<small>/50</small></b><span>UEMS</span></div><div class="stat-mini"><b>${oz.a.lems}<small>/50</small></b><span>LEMS</span></div>
+    <div class="stat-mini"><b>${oz.a.dok}<small>/112</small></b><span>Hafif dokunma</span></div><div class="stat-mini"><b>${oz.a.ign}<small>/112</small></b><span>İğne batma</span></div></div>
+   <table style="margin-top:10px"><tr><td class="muted" style="width:170px">Duyusal seviye</td><td>Sağ <b>${oz.a.duyuR}</b> · Sol <b>${oz.a.duyuL}</b></td></tr><tr><td class="muted">Motor seviye</td><td>Sağ <b>${oz.a.motorR}</b> · Sol <b>${oz.a.motorL}</b></td></tr><tr><td class="muted">Sakral korunma</td><td>${esc(oz.a.ais)}</td></tr>
+   <tr><td class="muted">AIS (senin kararın)</td><td>${muSel(m, prev, "ais", SEC.ais, 210)}</td></tr></table>
+   <p class="small muted" style="margin:8px 0 0">Seviyeler ISNCSCI kurallarının basitleştirilmiş uygulamasıyla hesaplanır (NT ve eksik hücreler sayılmaz${oz.a.eks ? `; ${oz.a.eks} hücre boş` : ""}). Kesin sınıflama için resmi ISNCSCI hesaplayıcısını kullan. Omurilik yaralanması dışındaki hastalarda yalnızca ilgili bölümleri doldurman yeterli.</p></div>
+  ${sec("duyu", "Duyu – dermatomlar (0 yok · 1 bozuk · 2 normal · NT)", `<div class="tbl-scroll"><table class="mu-t"><thead><tr><th>Dermatom</th><th class="hide-m">Anahtar nokta</th><th style="text-align:center">Sağ dokunma</th><th style="text-align:center">Sağ iğne</th><th style="text-align:center">Sol dokunma</th><th style="text-align:center">Sol iğne</th></tr></thead><tbody>${DERM.map(d => `<tr><td><b>${d}</b></td><td class="small muted hide-m">${esc(DERM_YER[d] || "")}</td>${["rd", "ri", "ld", "li"].map(k => `<td style="text-align:center">${muSel(m, prev, `duyu.${d}.${k}`, SEC.duyu, 58)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="row" style="gap:16px;margin-top:10px"><label class="f" style="width:220px">Derin anal basınç (DAP)${muSel(m, prev, "dap", SEC.evh, 200)}</label><label class="f" style="width:220px">İstemli anal kasılma (VAC)${muSel(m, prev, "vac", SEC.evh, 200)}</label></div>
+    <div class="row" style="margin-top:8px;gap:6px"><span class="small muted">Hızlı doldur:</span><button class="btn sm ghost" data-act="mu-fill" data-grp="duyu" data-v="2">Hepsi 2</button><button class="btn sm ghost" data-act="mu-fill" data-grp="duyu" data-v="">Temizle</button></div>`, acik.duyu)}
+  ${sec("motor", "Anahtar kaslar (MMT 0–5)", `<table class="mu-t"><thead><tr><th>Seviye</th><th>Kas grubu</th>${th}</tr></thead><tbody>${ANAHTAR.map(([k, l]) => `<tr><td><b>${k}</b></td><td>${l}</td>${lr("motor", k, SEC.mmt, 62)}</tr>`).join("")}</tbody></table>
+    <div class="row" style="margin-top:8px;gap:6px"><span class="small muted">Hızlı doldur:</span><button class="btn sm ghost" data-act="mu-fill" data-grp="motor" data-v="5">Hepsi 5</button><button class="btn sm ghost" data-act="mu-fill" data-grp="motor" data-v="">Temizle</button></div>`, acik.motor)}
+  ${sec("ref", "Derin tendon refleksleri ve patolojik refleksler", `<div class="grid g2"><table class="mu-t"><thead><tr><th>Refleks</th>${th}</tr></thead><tbody>${REFL.map(([k, l]) => `<tr><td>${l}</td>${lr("ref", k, SEC.ref, 62)}</tr>`).join("")}</tbody></table>
+    <table class="mu-t"><thead><tr><th>Patolojik</th>${th}</tr></thead><tbody>${PATO.map(([k, l]) => `<tr><td><a href="#" data-act="open-test" data-id="${{babinski:"t_babinski", hoffmann:"t_hoffmann", klonusA:"t_klonus", klonusP:"t_klonus"}[k]}">${l}</a></td>${lr("pato", k, SEC.pato, 96)}</tr>`).join("")}</tbody></table></div>
+    <p class="small muted" style="margin:6px 0 0">0 yok · 1+ azalmış · 2+ normal · 3+ canlı (yayılım olabilir) · 4+ klonusla birlikte hiperaktif.</p>`, acik.ref)}
+  ${sec("ton", "Kas tonusu – Modifiye Ashworth ve Tardieu", `<div class="tbl-scroll"><table class="mu-t"><thead><tr><th>Kas grubu</th><th style="text-align:center">Sağ MAS</th><th style="text-align:center">Sağ R1 / R2</th><th style="text-align:center">Sol MAS</th><th style="text-align:center">Sol R1 / R2</th></tr></thead><tbody>${TON_KAS.map(([k, l]) => `<tr><td>${l}</td>${["r", "l"].map(t => { const r1 = +muGet(m, `ton.${k}.${t}.r1`), r2 = +muGet(m, `ton.${k}.${t}.r2`); return `<td style="text-align:center">${muSel(m, prev, `ton.${k}.${t}.mas`, SEC.mas, 60)}</td><td style="text-align:center;white-space:nowrap">${muNum(m, `ton.${k}.${t}.r1`, "R1")} ${muNum(m, `ton.${k}.${t}.r2`, "R2")}${r1 && r2 ? `<div class="small muted">fark ${Math.abs(r2 - r1)}°</div>` : ""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="small muted" style="margin:6px 0 0">R1: hızlı germede yakalama açısı, R2: yavaş pasif EHA. Büyük R2–R1 farkı dinamik (refleks) bileşeni, küçük fark kontraktürü düşündürür. <a href="#" data-act="open-rehber" data-id="r_tonus">Kas tonusu rehberi</a></p>`, acik.ton)}
+  ${sec("kr", "Kranial sinirler", `<table class="mu-t"><tbody>${KRANIAL.map(([k, l]) => `<tr><td style="width:90px"><b>${k}</b></td><td>${l}</td><td>${muSel(m, prev, `kr.${k}`, SEC.kr, 150)}</td></tr>`).join("")}</tbody></table><label class="f" style="margin-top:8px">Not<input type="text" data-mut="krNot" value="${esc(m.krNot || "")}" placeholder="Ör. sağ periferik fasiyal paralizi, HB III"></label>`, acik.kr)}
+  ${sec("koor", "Koordinasyon ve denge", `<table class="mu-t"><thead><tr><th>Test</th>${th}</tr></thead><tbody>${KOOR.map(([k, l, ii]) => `<tr><td>${l}</td>${ii ? lr("koor", k, SEC.koor, 110) : `<td colspan="2" style="text-align:center">${muSel(m, prev, `koor.${k}`, SEC.koor0, 180)}</td>`}</tr>`).join("")}</tbody></table>
+    <p class="small muted" style="margin:6px 0 0"><a href="#" data-act="open-test" data-id="t_koordinasyon">Serebellar testler</a> · <a href="#" data-act="open-test" data-id="t_romberg">Romberg</a> · <a href="#" data-act="open-test" data-id="t_dix">Dix-Hallpike</a></p>`, acik.koor)}
+  <div class="card"><label class="f">Muayene notu / klinik yorum<textarea data-mut="not" rows="3" placeholder="Ör. Sol hemiparezi, üst ekstremitede fleksör sinerji baskın; omuz subluksasyonu 1 parmak…">${esc(m.not || "")}</textarea></label></div>
+  ${prev ? muFarkKart(prev, m) : ""}`;
+}
+function muFarkKart(a, b){
+  const rows = [];
+  const add = (lbl, path, list) => list.forEach(([k, l]) => ["r", "l"].forEach(t => { const x = muGet(a, `${path}.${k}.${t}`), y = muGet(b, `${path}.${k}.${t}`); if (x && y && x !== y) rows.push([`${lbl}: ${l || k} (${t === "r" ? "Sağ" : "Sol"})`, x, y]); }));
+  add("Motor", "motor", ANAHTAR.map(([k, l]) => [k, k + " " + l])); add("Refleks", "ref", REFL); add("Patolojik", "pato", PATO);
+  TON_KAS.forEach(([k, l]) => ["r", "l"].forEach(t => { const x = muGet(a, `ton.${k}.${t}.mas`), y = muGet(b, `ton.${k}.${t}.mas`); if (x && y && x !== y) rows.push([`MAS: ${l} (${t === "r" ? "Sağ" : "Sol"})`, x, y]); }));
+  let dch = 0; DERM.forEach(d => ["rd", "ri", "ld", "li"].forEach(k => { const x = muGet(a, `duyu.${d}.${k}`), y = muGet(b, `duyu.${d}.${k}`); if (x && y && x !== y) dch++; }));
+  const A = asiaHesap(a), B = asiaHesap(b);
+  return `<div class="card"><h2 style="margin-bottom:8px">Önceki muayeneye göre değişim (${fmtDate(a.tarih)} → ${fmtDate(b.tarih)})</h2>
+   <table><thead><tr><th>Bulgu</th><th>Önce</th><th>Şimdi</th></tr></thead><tbody>
+   ${[["UEMS", A.uems, B.uems], ["LEMS", A.lems, B.lems], ["Hafif dokunma", A.dok, B.dok], ["İğne batma", A.ign, B.ign]].filter(r => r[1] !== r[2]).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b> <span class="${r[2] > r[1] ? "delta-up" : "delta-down"}">(${r[2] > r[1] ? "+" : ""}${r[2] - r[1]})</span></td></tr>`).join("")}
+   ${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><b>${esc(r[2])}</b></td></tr>`).join("")}</tbody></table>
+   ${dch ? `<p class="small muted" style="margin:6px 0 0">${dch} dermatom hücresinde duyu değişikliği var (tabloda mor çerçeveli).</p>` : ""}${!rows.length && !dch && A.uems === B.uems && A.lems === B.lems ? `<p class="small muted" style="margin:0">Kaydedilen bulgularda değişiklik yok.</p>` : ""}</div>`;
+}
+function muMetin(p, m){
+  const oz = muOzet(m);
+  return `Nörolojik muayene – ${p.ad} (${fmtDate(m.tarih)})\n${oz.asia ? oz.asia + "\n" : ""}${oz.satirlar.join("\n")}${m.not ? "\nNot: " + m.not : ""}`;
+}
+Object.assign(EXT_ACT, {
+  "mu-new": (t, p) => muYeni(p),
+  "mu-sel": t => { V.muId = t.dataset.id; render(); },
+  "mu-del": (t, p) => confirmBox("Bu muayene kaydı silinecek.", () => { p.muayeneler = p.muayeneler.filter(x => x.id !== V.muId); V.muId = null; save(); render(); toast("Silindi"); }),
+  "mu-copy": (t, p) => { const m = (p.muayeneler || []).find(x => x.id === V.muId); if (m) copyText(muMetin(p, m)); },
+  "mu-fill": (t, p) => { const m = p.muayeneler.find(x => x.id === V.muId); const v = t.dataset.v;
+    if (t.dataset.grp === "duyu") DERM.forEach(d => ["rd", "ri", "ld", "li"].forEach(k => muSet(m, `duyu.${d}.${k}`, v)));
+    else ANAHTAR.forEach(([k]) => ["r", "l"].forEach(s => muSet(m, `motor.${k}.${s}`, v)));
+    save(); render(); }
+});
+EXT_CHANGE_FNS.push((t, p) => {
+  if (t.dataset.mu && p){ const m = p.muayeneler.find(x => x.id === V.muId); if (!m) return true; muSet(m, t.dataset.mu, t.value); p.guncel = new Date().toISOString(); save(); const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
+  if (t.dataset.mut === "tarih" && p){ const m = p.muayeneler.find(x => x.id === V.muId); if (m){ m.tarih = t.value || today(); p.muayeneler.sort((a, b) => a.tarih.localeCompare(b.tarih)); save(); render(); } return true; }
+  return false;
+});
+EXT_INPUT_FNS.push((t, p) => {
+  if (t.dataset.mu && t.type === "number" && p){ const m = p.muayeneler.find(x => x.id === V.muId); if (m){ muSet(m, t.dataset.mu, t.value); save(); } return true; }
+  if (t.dataset.mut && t.dataset.mut !== "tarih" && p){ const m = p.muayeneler.find(x => x.id === V.muId); if (m){ m[t.dataset.mut] = t.value; save(); } return true; }
+  return false;
+});
+document.addEventListener("toggle", e => { const d = e.target; if (d.dataset?.musec){ V.muAcik = V.muAcik || {duyu:true, motor:true, ref:true, ton:true}; V.muAcik[d.dataset.musec] = d.open; } }, true);
+
+// ===== İLERLEME GRAFİKLERİ, RAPORLAR, SPSS =====
+function grafikSVG(arr, sc, opt = {}){
+  const W = opt.w || 340, H = opt.h || 170, pl = 38, pr = 12, pt = 14, pb = 26;
+  const vals = arr.map(o => +o.deger), ts = arr.map(o => new Date(o.tarih).getTime());
+  const a = SC_ANLAM[sc.id], mc = a && a[0] != null && sc.yon ? vals[0] + sc.yon * a[0] : null;
+  const hedef = opt.hedef != null && opt.hedef !== "" ? +opt.hedef : null;
+  let lo = Math.min(...vals, ...(mc != null ? [mc] : []), ...(hedef != null ? [hedef] : [])), hi = Math.max(...vals, ...(mc != null ? [mc] : []), ...(hedef != null ? [hedef] : []));
+  if (sc.min != null && sc.max != null){ const pad = (sc.max - sc.min) * .08; lo = Math.max(sc.min, lo - pad); hi = Math.min(sc.max, hi + pad); }
+  if (sc.sec){ const ks = sc.sec.map(s => +s[0]); lo = Math.min(lo, ...ks); hi = Math.max(hi, ...ks); }
+  if (hi === lo){ hi += 1; lo -= 1; }
+  const t0 = Math.min(...ts), t1 = Math.max(...ts), tr = t1 - t0 || 1;
+  const X = t => arr.length === 1 ? (pl + W - pr) / 2 : pl + (t - t0) / tr * (W - pl - pr), Y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+  const good = sc.yon === 0 || vals.length < 2 ? null : (vals.at(-1) - vals[0]) * sc.yon > 0;
+  const col = good == null ? "#5b2fd4" : good ? "#14804a" : vals.at(-1) === vals[0] ? "#7a8191" : "#d01b2f";
+  const ticks = [lo, (lo + hi) / 2, hi].map(v => Math.round(v * 10) / 10);
+  const fmt = v => sc.sec ? (sc.sec.find(s => +s[0] === +v)?.[0] ?? v) : v;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="10">
+   ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e4e6ec"/><text x="${pl - 6}" y="${Y(v) + 3}" text-anchor="end" fill="#7a8191">${fmt(v)}</text>`).join("")}
+   ${mc != null && mc >= lo && mc <= hi ? `<line x1="${pl}" x2="${W - pr}" y1="${Y(mc)}" y2="${Y(mc)}" stroke="#5b2fd4" stroke-dasharray="4 3" stroke-width="1.2"/><text x="${W - pr}" y="${Y(mc) - 4}" text-anchor="end" fill="#5b2fd4">anlamlı değişim eşiği</text>` : ""}
+   ${hedef != null ? `<line x1="${pl}" x2="${W - pr}" y1="${Y(hedef)}" y2="${Y(hedef)}" stroke="#d01b2f" stroke-dasharray="6 3" stroke-width="1.2"/><text x="${pl + 4}" y="${Y(hedef) - 4}" fill="#d01b2f">hedef ${hedef}</text>` : ""}
+   ${arr.length > 1 ? `<polyline points="${arr.map((o, i) => `${X(ts[i])},${Y(vals[i])}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"/>` : ""}
+   ${arr.map((o, i) => `<circle cx="${X(ts[i])}" cy="${Y(vals[i])}" r="3.4" fill="#fff" stroke="${col}" stroke-width="2"/>${arr.length <= 8 ? `<text x="${X(ts[i])}" y="${Y(vals[i]) - 7}" text-anchor="middle" fill="#0d1017" font-weight="600">${fmt(vals[i])}</text>` : ""}`).join("")}
+   <text x="${pl}" y="${H - 6}" fill="#7a8191">${fmtDate(arr[0].tarih)}</text>${arr.length > 1 ? `<text x="${W - pr}" y="${H - 6}" text-anchor="end" fill="#7a8191">${fmtDate(arr.at(-1).tarih)}</text>` : ""}
+  </svg>`;
+}
+function hedefDeger(p, sid){ const h = (p.program?.hedefler || []).find(x => x.olcek === sid && x.hedef !== "" && x.hedef != null && x.durum !== "birakildi"); return h ? h.hedef : null; }
+function grafikPanel(p){
+  const g = measureGroups(p), keys = Object.keys(g).filter(k => g[k].length > 1 && S(g[k][0].sid));
+  if (!keys.length) return "";
+  const ac = V.grafikAcik !== false;
+  return `<details class="grafik-wrap" ${ac ? "open" : ""} data-grafik="1" style="margin-bottom:14px"><summary class="small" style="cursor:pointer;color:var(--teal);font-weight:600">${ic("chart").replace("<svg", '<svg width="14" height="14" style="vertical-align:-2px"')} İlerleme grafikleri (${keys.length})</summary>
+   <div class="grid g3" style="margin-top:10px">${keys.map(k => { const a = g[k], sc = S(a[0].sid); return `<div class="gcard" data-act="grafik" data-key="${esc(k)}"><div class="small" style="font-weight:600;margin-bottom:4px">${esc(sc.ad)}${sc.alt && a[0].not ? ` <span class="muted">· ${esc(a[0].not)}</span>` : ""}</div>${grafikSVG(a, sc, {w:300, h:140, hedef:hedefDeger(p, sc.id)})}</div>`; }).join("")}</div>
+   <p class="small muted" style="margin:8px 0 0">Kesikli mor çizgi: ilk ölçüme göre anlamlı değişim (MCID/MDC) eşiği · kırmızı: hedeflerde bu ölçeğe bağlı hedef değer.</p></details>`;
+}
+document.addEventListener("toggle", e => { if (e.target.dataset?.grafik) V.grafikAcik = e.target.open; }, true);
+function grafikModal(p, key){
+  const a = measureGroups(p)[key]; if (!a) return; const sc = S(a[0].sid);
+  const d = +a.at(-1).deger - +a[0].deger;
+  modal(esc(sc.ad) + (sc.alt && a[0].not ? ` · ${esc(a[0].not)}` : ""), `${grafikSVG(a, sc, {w:620, h:260, hedef:hedefDeger(p, sc.id)})}
+   <div class="row" style="gap:10px;margin:10px 0">${anlamBadge(sc, d, a.length)}<span class="small muted">İlk ${esc(scaleLabel(sc, a[0].deger))} → son ${esc(scaleLabel(sc, a.at(-1).deger))} (${d > 0 ? "+" : ""}${Math.round(d * 100) / 100})${SC_ANLAM[sc.id] ? " · " + esc(SC_ANLAM[sc.id][1]) : ""}</span></div>
+   <table><thead><tr><th>Tarih</th><th>Değer</th><th>Öncekine göre</th><th>Not</th></tr></thead><tbody>${a.map((o, i) => `<tr><td>${fmtDate(o.tarih)}</td><td><b>${esc(scaleLabel(sc, o.deger))}</b></td><td>${i ? ((+o.deger - +a[i - 1].deger) > 0 ? "+" : "") + Math.round((+o.deger - +a[i - 1].deger) * 100) / 100 : "—"}</td><td class="small">${esc(o.not)}</td></tr>`).join("")}</tbody></table>`,
+   `<button class="btn" data-act="open-scale" data-id="${sc.id}">Ölçek bilgisi</button><span class="sp"></span><button class="btn pri" data-act="close-modal">Kapat</button>`, "lg");
+}
+
+// ---------------- RAPORLAR ----------------
+const RAPOR_TUR = {
+  ara:["Ara değerlendirme raporu", "Tedavi sürecindeki ilerlemenin özeti."],
+  hekim:["Hekime bilgi / yönlendirme notu", "Sevk eden hekime durum bildirimi veya yönlendirme."],
+  epikriz:["Epikriz (taburculuk raporu)", "Tedavi sonunda özet, sonuçlar ve öneriler."]
+};
+function raporSecenek(p){
+  modal("Rapor hazırla – " + esc(p.ad), `<div class="grid g3">${Object.entries(RAPOR_TUR).map(([k, [t, d]]) => `<label class="pick ${k === "ara" ? "on" : ""}" style="cursor:pointer"><input type="radio" name="rp-tur" value="${k}" ${k === "ara" ? "checked" : ""} style="width:auto"> <b>${t}</b><div class="small muted">${d}</div></label>`).join("")}</div>
+   <h3 style="margin:14px 0 6px">İçerik</h3><div class="chips">${[["olc", "Ölçüm tablosu", 1], ["graf", "Grafikler", 1], ["noro", "Nörolojik muayene", (p.muayeneler || []).length], ["hed", "Hedefler", 1], ["prog", "Uygulanan tedavi", 1], ["ev", "Ev programı ve uyum", 1], ["vital", "Seans vital bulguları", 0]].map(([k, l, on]) => `<label class="chip ${on ? "on" : ""}" style="cursor:pointer"><input type="checkbox" class="rp-ic" value="${k}" ${on ? "checked" : ""} style="width:auto;margin-right:4px">${l}</label>`).join("")}</div>
+   <div class="grid g2" style="margin-top:12px"><label class="f">Başlangıç tarihi<input type="date" id="rp-bas" value="${[...(p.olcumler || []).map(o => o.tarih), ...(p.seanslar || []).map(x => x.tarih), ...(p.muayeneler || []).map(m => m.tarih), p.olusturma].filter(Boolean).sort()[0] || ""}"></label><label class="f">Bitiş tarihi<input type="date" id="rp-bit" value="${today()}"></label></div>
+   <label class="f" style="margin-top:10px">Alıcı (isteğe bağlı)<input type="text" id="rp-alici" placeholder="Ör. Sayın Dr. … (Nöroloji)" value="${esc(p.sevk ? "Sevk eden: " + p.sevk : "")}"></label>
+   <label class="f" style="margin-top:10px">Değerlendirme ve öneriler<textarea id="rp-yorum" rows="5" placeholder="Klinik yorum, sonuç, öneriler…">${esc(raporOneri(p, "ara"))}</textarea></label>
+   <label class="row small" style="margin-top:8px;cursor:pointer"><input type="checkbox" id="rp-anon" style="width:auto"> Hasta adı yerine baş harfleri kullan</label>`,
+   `<span class="sp"></span><button class="btn" data-act="close-modal">Vazgeç</button><button class="btn pri" id="rp-go">${ic("doc")} Raporu oluştur</button>`, "lg");
+  document.querySelectorAll('[name="rp-tur"]').forEach(r => r.onchange = () => { document.querySelectorAll('[name="rp-tur"]').forEach(x => x.closest(".pick").classList.toggle("on", x.checked)); $("#rp-yorum").value = raporOneri(p, r.value); });
+  document.querySelectorAll(".rp-ic").forEach(c => c.onchange = () => c.closest(".chip").classList.toggle("on", c.checked));
+  $("#rp-go").onclick = () => {
+    const o = {tur:document.querySelector('[name="rp-tur"]:checked').value, ic:[...document.querySelectorAll(".rp-ic:checked")].map(x => x.value), bas:$("#rp-bas").value, bit:$("#rp-bit").value, alici:$("#rp-alici").value.trim(), yorum:$("#rp-yorum").value.trim(), anon:$("#rp-anon").checked};
+    const html = raporHTML(p, o);
+    (p.raporlar = p.raporlar || []).push({id:uid(), tarih:today(), tur:o.tur}); save();
+    modal(RAPOR_TUR[o.tur][0], `<iframe id="rp-frame" style="width:100%;height:62vh;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe>`,
+      `<span class="small muted sp">İndirilen dosyayı açıp “Yazdır / PDF” ile PDF'e çevirebilirsin.</span><button class="btn" id="rp-copy">${ic("copy")} Metni kopyala</button><button class="btn pri" id="rp-dl">${ic("dl")} İndir</button>`, "lg");
+    $("#rp-frame").srcdoc = html;
+    $("#rp-dl").onclick = () => downloadFile(`${o.tur === "epikriz" ? "epikriz" : o.tur === "hekim" ? "hekime-not" : "ara-degerlendirme"}-${(o.anon ? initials(p.ad) : p.ad || "hasta").replace(/[^\wçğıöşüÇĞİÖŞÜ]+/g, "-")}-${today()}.html`, html);
+    $("#rp-copy").onclick = () => { const d = document.createElement("div"); d.innerHTML = html.replace(/<style[\s\S]*?<\/style>|<svg[\s\S]*?<\/svg>|<button[\s\S]*?<\/button>/g, ""); copyText(d.innerText.replace(/\n{3,}/g, "\n\n").trim()); };
+  };
+}
+function raporOneri(p, tur){
+  const g = measureGroups(p), iy = [], ko = [];
+  Object.values(g).forEach(a => { const sc = S(a[0].sid); if (!sc || a.length < 2 || !sc.yon) return; const an = SC_ANLAM[sc.id]; const d = (+a.at(-1).deger - +a[0].deger) * sc.yon; if (an && d >= an[0]) iy.push(sc.ad); else if (an && d <= -an[0]) ko.push(sc.ad); });
+  const n = (p.seanslar || []).length;
+  const hed = (p.program?.hedefler || []), ul = hed.filter(h => h.durum === "ulasildi").length;
+  const giris = tur === "hekim" ? "Hastanız fizyoterapi programımıza devam etmektedir." : tur === "epikriz" ? "Hasta planlanan fizyoterapi ve rehabilitasyon programını tamamlamıştır." : "Tedavi sürecinin ara değerlendirmesi yapılmıştır.";
+  return [giris, n ? `Toplam ${n} seans uygulanmıştır.` : "", iy.length ? `${iy.join(", ")} ölçümlerinde klinik olarak anlamlı iyileşme saptanmıştır.` : "", ko.length ? `${ko.join(", ")} ölçümlerinde anlamlı kötüleşme izlenmiştir; değerlendirilmesi önerilir.` : "", hed.length ? `${hed.length} hedeften ${ul} tanesine ulaşılmıştır.` : "",
+    tur === "epikriz" ? "Ev egzersiz programına düzenli devam etmesi, ... ay sonra kontrol değerlendirmesi önerilir." : tur === "hekim" ? "Bilgilerinize sunarım." : "Programa devam edilmesi planlanmıştır."].filter(Boolean).join(" ");
+}
+function raporHTML(p, o){
+  const inR = d => (!o.bas || d >= o.bas) && (!o.bit || d <= o.bit);
+  const ad = o.anon ? initials(p.ad) : p.ad, ses = (p.seanslar || []).filter(s => inR(s.tarih));
+  const g = {}; (p.olcumler || []).filter(x => inR(x.tarih) && x.not !== "seans öncesi").forEach(x => { const k = x.sid + (S(x.sid)?.alt ? "|" + (x.not || "").trim().toLocaleLowerCase("tr") : ""); (g[k] = g[k] || []).push(x); });
+  Object.values(g).forEach(a => a.sort((x, y) => x.tarih.localeCompare(y.tarih)));
+  const conds = (p.condIds || []).map(C).filter(Boolean);
+  const sec = (t, h) => `<h2>${t}</h2>${h}`;
+  let body = "";
+  body += `<table class="info"><tr><td>Hasta</td><td><b>${esc(ad)}</b>${age(p) ? `, ${age(p)} yaş` : ""}${p.cins ? `, ${esc(p.cins)}` : ""}${p.protokol ? ` · Protokol no: ${esc(p.protokol)}` : ""}</td></tr>
+   <tr><td>Tıbbi tanı</td><td>${esc(p.tani || "—")}</td></tr><tr><td>Fizyoterapi protokolü</td><td>${conds.map(c => esc(c.ad)).join(", ") || "—"}</td></tr>
+   ${p.sevk ? `<tr><td>Sevk</td><td>${esc(p.sevk)}</td></tr>` : ""}<tr><td>Değerlendirme dönemi</td><td>${fmtDate(o.bas)} – ${fmtDate(o.bit)}</td></tr>
+   <tr><td>Seans</td><td>${ses.length} seans${ses.length ? ` (${fmtDate(ses[0].tarih)} – ${fmtDate(ses.at(-1).tarih)}), ortalama ${Math.round(ses.reduce((t, s) => t + (s.sureDk || 0), 0) / ses.length)} dk` : ""}</td></tr></table>`;
+  if (o.ic.includes("olc") && Object.keys(g).length) body += sec("Ölçüm sonuçları", `<table><thead><tr><th>Ölçek</th><th>İlk</th><th>Son</th><th>Değişim</th><th>Yorum</th></tr></thead><tbody>${Object.values(g).map(a => { const sc = S(a[0].sid); if (!sc) return ""; const d = +a.at(-1).deger - +a[0].deger, an = SC_ANLAM[sc.id];
+      const yor = a.length < 2 || !sc.yon ? "—" : an ? (d * sc.yon >= an[0] ? "Anlamlı iyileşme" : d * sc.yon <= -an[0] ? "Anlamlı kötüleşme" : "Ölçüm hatası sınırında") : (d * sc.yon > 0 ? "İyileşme" : d === 0 ? "Değişim yok" : "Kötüleşme");
+      return `<tr><td>${esc(sc.ad)}${sc.alt && a[0].not ? ` <span class="m">(${esc(a[0].not)})</span>` : ""}</td><td>${esc(scaleLabel(sc, a[0].deger))}<div class="m">${fmtDate(a[0].tarih)}</div></td><td>${a.length > 1 ? esc(scaleLabel(sc, a.at(-1).deger)) + `<div class="m">${fmtDate(a.at(-1).tarih)}</div>` : "—"}</td><td>${a.length > 1 ? (d > 0 ? "+" : "") + Math.round(d * 100) / 100 : "—"}</td><td>${yor}</td></tr>`; }).join("")}</tbody></table><p class="m">Anlamlı değişim: ölçüm hatasını (MDC) / minimal klinik önemli farkı (MCID) aşan değişim.</p>`);
+  if (o.ic.includes("graf")){ const gs = Object.values(g).filter(a => a.length > 1 && S(a[0].sid)); if (gs.length) body += sec("İlerleme grafikleri", `<div class="gr">${gs.map(a => { const sc = S(a[0].sid); return `<div class="gi"><div class="gt">${esc(sc.ad)}${sc.alt && a[0].not ? ` · ${esc(a[0].not)}` : ""}</div>${grafikSVG(a, sc, {w:320, h:150, hedef:hedefDeger(p, sc.id)})}</div>`; }).join("")}</div>`); }
+  if (o.ic.includes("noro")){ const mu = (p.muayeneler || []).filter(m => inR(m.tarih)); if (mu.length){ const l = mu.at(-1), f = mu[0], oz = muOzet(l); body += sec("Nörolojik muayene", `<p><b>${fmtDate(l.tarih)}:</b> ${esc(oz.asia || "")}</p>${oz.satirlar.length ? `<ul>${oz.satirlar.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}${l.not ? `<p>${esc(l.not)}</p>` : ""}${mu.length > 1 ? (() => { const A = asiaHesap(f), B = asiaHesap(l); return `<p class="m">İlk muayeneye göre (${fmtDate(f.tarih)}): UEMS ${A.uems}→${B.uems}, LEMS ${A.lems}→${B.lems}, hafif dokunma ${A.dok}→${B.dok}, iğne batma ${A.ign}→${B.ign}.</p>`; })() : ""}`); } }
+  if (o.ic.includes("hed") && (p.program?.hedefler || []).length) body += sec("Hedefler", `<table><thead><tr><th>Hedef</th><th>Vade</th><th>Durum</th></tr></thead><tbody>${p.program.hedefler.map(h => `<tr><td>${esc(h.metin)}</td><td>${h.vade === "uzun" ? "Uzun" : "Kısa"}</td><td>${esc(DURUM[h.durum] || h.durum || "")}</td></tr>`).join("")}</tbody></table>`);
+  if (o.ic.includes("prog")){ const say = {}; ses.forEach(s => (s.uygulanan || []).filter(u => u.yapildi).forEach(u => { const k = u.ad; say[k] = (say[k] || 0) + 1; }));
+    const L = Object.entries(say).sort((a, b) => b[1] - a[1]);
+    body += sec("Uygulanan tedavi", L.length ? `<ul>${L.map(([k, n]) => `<li>${esc(k)} <span class="m">(${n} seans)</span></li>`).join("")}</ul>` : `<p>${(p.program?.klinik || []).map(k => esc(k.ad)).join(", ") || "—"}</p>`); }
+  if (o.ic.includes("ev") && (p.program?.ev || []).length){ const u = ses.filter(s => s.uyum != null && s.uyum !== ""); body += sec("Ev egzersiz programı", `<p>${p.program.ev.map(x => E(x.eid)?.ad).filter(Boolean).map(esc).join(", ")}.</p>${u.length ? `<p>Ev programına bildirilen ortalama uyum: <b>%${Math.round(u.reduce((t, s) => t + +s.uyum, 0) / u.length)}</b> (${u.length} seans).</p>` : ""}`); }
+  if (o.ic.includes("vital")){ const v = ses.filter(s => s.oncesi && (s.oncesi.kh || s.oncesi.kb || s.oncesi.spo2)); if (v.length) body += sec("Seans vital bulguları", `<table><thead><tr><th>Tarih</th><th>Öncesi</th><th>Sonrası</th></tr></thead><tbody>${v.map(s => { const f = o => [o.vas !== undefined && o.vas !== "" ? "VAS " + o.vas : "", o.kh ? "KH " + o.kh : "", o.kb ? "KB " + o.kb : "", o.spo2 ? "SpO₂ %" + o.spo2 : ""].filter(Boolean).join(" · "); return `<tr><td>${fmtDate(s.tarih)}</td><td>${esc(f(s.oncesi || {}))}</td><td>${esc(f(s.sonrasi || {}))}</td></tr>`; }).join("")}</tbody></table>`); }
+  if (o.yorum) body += sec(o.tur === "epikriz" ? "Sonuç ve öneriler" : "Değerlendirme ve öneriler", `<p style="white-space:pre-wrap">${esc(o.yorum)}</p>`);
+  return `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(RAPOR_TUR[o.tur][0])} – ${esc(ad)}</title><style>
+   body{font-family:"IBM Plex Sans",-apple-system,"Segoe UI",Arial,sans-serif;max-width:800px;margin:24px auto;padding:0 22px;color:#0d1017;font-size:13.5px;line-height:1.5}
+   .hd{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #0b0d13;padding-bottom:12px;margin-bottom:6px}.hd h1{margin:0;font-size:22px}.hd .k{color:#5b2fd4;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+   h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#5b2fd4;border-bottom:1px solid #dde0e8;padding-bottom:4px;margin:22px 0 8px}
+   table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #e6e8ee;vertical-align:top}th{background:#f3f4f7;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#3b4250}
+   table.info td:first-child{width:180px;color:#7a8191}.m{color:#7a8191;font-size:11.5px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gi{border:1px solid #e6e8ee;border-radius:8px;padding:8px 10px;break-inside:avoid}.gt{font-weight:600;font-size:12px;margin-bottom:2px}
+   .imza{display:flex;justify-content:flex-end;margin-top:36px}.imza div{text-align:center;min-width:220px;border-top:1px solid #0d1017;padding-top:6px}
+   .pb{position:fixed;top:12px;right:12px;padding:8px 14px;border-radius:6px;border:0;background:#5b2fd4;color:#fff;font-size:13px;cursor:pointer}@media print{.pb{display:none}body{margin:0}}
+  </style></head><body><button class="pb" onclick="window.print()">Yazdır / PDF</button>
+  <div class="hd"><div><div class="k">${esc(DB.ayar.klinik || "Fizyoterapi ve Rehabilitasyon")}</div><h1>${esc(RAPOR_TUR[o.tur][0])}</h1><div class="m">Düzenlenme: ${fmtDate(today())}</div></div><div style="text-align:right;font-size:12.5px">${esc(DB.ayar.terapist || "")}<br>${esc(DB.ayar.unvan || "")}</div></div>
+  ${o.alici ? `<p style="margin:12px 0 0">${esc(o.alici)}</p>` : ""}
+  ${body}
+  <div class="imza"><div>${esc(DB.ayar.terapist || "")}<br><span class="m">${esc(DB.ayar.unvan || "Fizyoterapist")} · İmza</span></div></div>
+  </body></html>`;
+}
+
+// ---------------- SPSS ----------------
+function spssVar(s){ const tr = {ç:"c", ğ:"g", ı:"i", ö:"o", ş:"s", ü:"u", Ç:"c", Ğ:"g", İ:"i", Ö:"o", Ş:"s", Ü:"u"}; let v = String(s).replace(/[çğıöşüÇĞİÖŞÜ]/g, c => tr[c]).toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, ""); if (!/^[a-z]/.test(v)) v = "v_" + v; return v.slice(0, 48); }
+function spssKart(){
+  return `<div class="card"><h2 style="margin-bottom:6px">SPSS'e aktar (araştırma)</h2><p class="small muted" style="margin-top:0">Hasta ölçümlerini anonim olarak SPSS'e hazır tabloya döker: her satır bir hasta, her ölçek için ön test (T1), son test (T2) ve fark. Değişken ve değer etiketlerini tanımlayan SPSS söz dizimi (.sps) dosyası da hazırlanır. Ad soyad aktarılmaz.</p><button class="btn pri" data-act="spss">${ic("table")} Veri setini hazırla</button></div>`;
+}
+function spssModal(){
+  const conds = [...new Set(DB.hastalar.flatMap(h => h.condIds || []))].map(C).filter(Boolean);
+  modal("SPSS veri seti", `<div class="grid g2"><label class="f">Alan<select id="sp-alan"><option value="">Tümü</option>${Object.entries(ALANLAR).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
+   <label class="f">Protokol<select id="sp-cond"><option value="">Tümü</option>${conds.map(c => `<option value="${c.id}">${esc(c.ad)}</option>`).join("")}</select></label>
+   <label class="f">Kayıt tarihi (başlangıç)<input type="date" id="sp-bas"></label><label class="f">Kayıt tarihi (bitiş)<input type="date" id="sp-bit"></label></div>
+   <h3 style="margin:14px 0 6px">Format</h3>
+   <label class="row small" style="cursor:pointer;margin:4px 0"><input type="radio" name="sp-f" value="genis" checked style="width:auto"> <b>Geniş format</b> – her hasta bir satır; her ölçek için T1 (ilk), T2 (son), fark. Eşleştirilmiş t-testi / Wilcoxon için.</label>
+   <label class="row small" style="cursor:pointer;margin:4px 0"><input type="radio" name="sp-f" value="zaman" style="width:auto"> <b>Tüm zaman noktaları</b> – her ölçek için T1, T2, T3… (tekrarlı ölçümler ANOVA / Friedman için).</label>
+   <label class="row small" style="cursor:pointer;margin:4px 0"><input type="radio" name="sp-f" value="uzun" style="width:auto"> <b>Uzun format</b> – her satır bir ölçüm (hasta, ölçek, tarih, gün, değer). Karma modeller için.</label>
+   <label class="row small" style="cursor:pointer;margin:10px 0 0"><input type="checkbox" id="sp-kim" style="width:auto"> Kimlik eşleme tablosunu da indir (ID ↔ ad; veri setinden ayrı ve güvenli sakla)</label>
+   <div id="sp-on" class="note info small" style="margin-top:12px"></div>`,
+   `<span class="sp"></span><button class="btn" data-act="close-modal">Vazgeç</button><button class="btn pri" id="sp-go">${ic("dl")} İndir (.csv + .sps)</button>`, "lg");
+  const upd = () => { const d = spssVeri(spssOpt()); $("#sp-on").innerHTML = `<b>${d.n}</b> hasta · <b>${d.cols.length}</b> değişken${d.n ? ` · ilk satırlar: ${esc(d.cols.slice(0, 8).join(", "))}${d.cols.length > 8 ? "…" : ""}` : ""}`; };
+  ["sp-alan", "sp-cond", "sp-bas", "sp-bit"].forEach(i => $("#" + i).onchange = upd); document.querySelectorAll('[name="sp-f"]').forEach(r => r.onchange = upd); upd();
+  $("#sp-go").onclick = async () => { const o = spssOpt(), d = spssVeri(o); if (!d.n){ toast("Seçime uyan hasta yok"); return; }
+    const ad = `fizyo-seans-${o.f}-${today()}`;
+    await downloadFile(ad + ".csv", "﻿" + d.csv); await downloadFile(ad + ".sps", d.sps);
+    if ($("#sp-kim").checked) await downloadFile(`kimlik-eslesme-${today()}.csv`, "﻿" + "ID,ad,protokol_no\n" + d.kimlik.map(r => r.map(csvCell).join(",")).join("\n"));
+    toast("Veri seti indirildi"); };
+}
+function spssOpt(){ return {alan:$("#sp-alan").value, cond:$("#sp-cond").value, bas:$("#sp-bas").value, bit:$("#sp-bit").value, f:document.querySelector('[name="sp-f"]:checked').value}; }
+const csvCell = v => v == null || v === "" ? "" : typeof v === "number" ? String(v) : /[",\n]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+function spssVeri(o){
+  const hs = DB.hastalar.filter(h => (!o.alan || (h.condIds || []).some(id => C(id)?.alan === o.alan)) && (!o.cond || (h.condIds || []).includes(o.cond)) && (!o.bas || (h.olusturma || "") >= o.bas) && (!o.bit || (h.olusturma || "") <= o.bit));
+  const alanKod = Object.keys(ALANLAR), condList = [...new Set(hs.flatMap(h => h.condIds || []))];
+  const vlab = {}, vals = {}, strs = new Set(["ID", "tani", "protokol_ad"]);
+  const kimlik = hs.map((h, i) => ["P" + String(i + 1).padStart(3, "0"), h.ad, h.protokol || ""]);
+  const grpKey = x => { const sc = S(x.sid); const base = spssVar(x.sid.replace(/^s_/, "")); return sc?.alt && x.not ? base + "_" + spssVar(x.not).slice(0, 20) : base; };
+  if (o.f === "uzun"){
+    const cols = ["ID", "yas", "cinsiyet", "alan", "protokol", "olcek", "olcek_kod", "tarih", "gun", "deger"];
+    const rows = []; const olcKod = {};
+    hs.forEach((h, i) => { const ol = (h.olcumler || []).filter(x => x.not !== "seans öncesi").sort((a, b) => a.tarih.localeCompare(b.tarih)); const t0 = ol[0] ? new Date(ol[0].tarih) : null;
+      ol.forEach(x => { const k = grpKey(x); olcKod[k] = olcKod[k] || Object.keys(olcKod).length + 1; rows.push([kimlik[i][0], age(h) || "", h.cins === "Kadın" ? 1 : h.cins === "Erkek" ? 2 : "", alanKod.indexOf(C((h.condIds || [])[0])?.alan) + 1 || "", condList.indexOf((h.condIds || [])[0]) + 1 || "", k, olcKod[k], x.tarih, t0 ? Math.round((new Date(x.tarih) - t0) / 864e5) : "", +x.deger]); }); });
+    const sps = spssSyntax(cols, {ID:"A8", olcek:"A60", tarih:"SDATE10"}, {ID:"Hasta kodu", yas:"Yaş (yıl)", cinsiyet:"Cinsiyet", alan:"Klinik alan", protokol:"Fizyoterapi protokolü", olcek:"Ölçek", olcek_kod:"Ölçek kodu", tarih:"Ölçüm tarihi", gun:"İlk ölçümden bu yana gün", deger:"Ölçüm değeri"},
+      {cinsiyet:[[1, "Kadın"], [2, "Erkek"]], alan:alanKod.map((k, i) => [i + 1, ALANLAR[k]]), protokol:condList.map((c, i) => [i + 1, C(c)?.ad || c]), olcek_kod:Object.entries(olcKod).map(([k, n]) => [n, k])}, o);
+    return {n:hs.length, cols, csv:[cols.join(","), ...rows.map(r => r.map(csvCell).join(","))].join("\n"), sps, kimlik};
+  }
+  const cols = ["ID", "yas", "cinsiyet", "alan", "protokol", "tani", "seans_sayisi", "tedavi_gun", "uyum_ort", "vas_seans_T1", "vas_seans_T2"];
+  Object.assign(vlab, {ID:"Hasta kodu", yas:"Yaş (yıl)", cinsiyet:"Cinsiyet", alan:"Klinik alan", protokol:"Fizyoterapi protokolü (ilk)", tani:"Tıbbi tanı", seans_sayisi:"Seans sayısı", tedavi_gun:"İlk-son seans arası gün", uyum_ort:"Ev programı uyumu ortalama (%)", vas_seans_T1:"Seans öncesi VAS – ilk seans", vas_seans_T2:"Seans öncesi VAS – son seans"});
+  Object.assign(vals, {cinsiyet:[[1, "Kadın"], [2, "Erkek"]], alan:alanKod.map((k, i) => [i + 1, ALANLAR[k]]), protokol:condList.map((c, i) => [i + 1, C(c)?.ad || c])});
+  const groups = hs.map(h => { const g = {}; (h.olcumler || []).filter(x => x.not !== "seans öncesi").forEach(x => (g[grpKey(x)] = g[grpKey(x)] || []).push(x)); Object.values(g).forEach(a => a.sort((x, y) => x.tarih.localeCompare(y.tarih))); return g; });
+  const keys = [...new Set(groups.flatMap(g => Object.keys(g)))].sort();
+  const maxT = {}; keys.forEach(k => maxT[k] = Math.max(...groups.map(g => (g[k] || []).length)));
+  keys.forEach(k => { const any = groups.find(g => g[k])[k][0], sc = S(any.sid), nm = sc.ad + (sc.alt && any.not ? " – " + any.not : "");
+    const n = o.f === "zaman" ? maxT[k] : 2;
+    for (let i = 1; i <= n; i++){ cols.push(`${k}_T${i}`); vlab[`${k}_T${i}`] = `${nm} – T${i}${o.f === "genis" ? (i === 1 ? " (ilk)" : " (son)") : ""}`; if (sc.sec) vals[`${k}_T${i}`] = sc.sec.map(s => [+s[0], s[1]]); }
+    if (o.f === "genis" && !sc.sec){ cols.push(`${k}_fark`); vlab[`${k}_fark`] = `${nm} – fark (T2-T1)`; }
+  });
+  const rows = hs.map((h, i) => { const g = groups[i], ses = h.seanslar || [], u = ses.filter(s => s.uyum != null && s.uyum !== ""), vs = ses.filter(s => s.oncesi?.vas !== undefined && s.oncesi?.vas !== "");
+    const r = {ID:kimlik[i][0], yas:age(h) || "", cinsiyet:h.cins === "Kadın" ? 1 : h.cins === "Erkek" ? 2 : "", alan:alanKod.indexOf(C((h.condIds || [])[0])?.alan) + 1 || "", protokol:condList.indexOf((h.condIds || [])[0]) + 1 || "", tani:h.tani || "", seans_sayisi:ses.length, tedavi_gun:ses.length > 1 ? Math.round((new Date(ses.at(-1).tarih) - new Date(ses[0].tarih)) / 864e5) : "", uyum_ort:u.length ? Math.round(u.reduce((t, s) => t + +s.uyum, 0) / u.length) : "", vas_seans_T1:vs.length ? +vs[0].oncesi.vas : "", vas_seans_T2:vs.length > 1 ? +vs.at(-1).oncesi.vas : ""};
+    keys.forEach(k => { const a = g[k] || []; if (o.f === "zaman") a.forEach((x, j) => r[`${k}_T${j + 1}`] = +x.deger); else { r[`${k}_T1`] = a.length ? +a[0].deger : ""; r[`${k}_T2`] = a.length > 1 ? +a.at(-1).deger : ""; if (`${k}_fark` in vlab) r[`${k}_fark`] = a.length > 1 ? Math.round((+a.at(-1).deger - +a[0].deger) * 1000) / 1000 : ""; } });
+    return r; });
+  const sps = spssSyntax(cols, {ID:"A8", tani:"A200"}, vlab, vals, o);
+  return {n:hs.length, cols, csv:[cols.join(","), ...rows.map(r => cols.map(c => csvCell(r[c])).join(","))].join("\n"), sps, kimlik};
+}
+function spssSyntax(cols, tipler, vlab, vals, o){
+  const ad = `fizyo-seans-${o.f}-${today()}.csv`;
+  const q = s => "'" + String(s).replace(/'/g, "''") + "'";
+  return `* Fizyo Seans – SPSS söz dizimi (${fmtDate(today())}).
+* 1) Bu dosyayı ve ${ad} dosyasını aynı klasöre koyun.
+* 2) Aşağıdaki FILE= satırındaki yolu kendi klasörünüzle değiştirin (ör. '/Users/buse/Desktop/${ad}').
+* 3) Tümünü seçip çalıştırın (Run > All).
+SET DECIMAL=DOT.
+SET UNICODE=ON.
+GET DATA /TYPE=TXT
+  /FILE=${q(ad)}
+  /ENCODING='UTF8'
+  /DELCASE=LINE
+  /DELIMITERS=","
+  /QUALIFIER='"'
+  /ARRANGEMENT=DELIMITED
+  /FIRSTCASE=2
+  /VARIABLES=
+${cols.map(c => `  ${c} ${tipler[c] || "F8.2"}`).join("\n")}.
+CACHE.
+EXECUTE.
+DATASET NAME FizyoSeans WINDOW=FRONT.
+
+VARIABLE LABELS
+${cols.filter(c => vlab[c]).map(c => `  ${c} ${q(vlab[c])}`).join("\n")}.
+
+${Object.entries(vals).filter(([k]) => cols.includes(k)).map(([k, a]) => `VALUE LABELS ${k}\n${a.map(([v, l]) => `  ${v} ${q(l)}`).join("\n")}.`).join("\n")}
+
+VARIABLE LEVEL ${["cinsiyet", "alan", "protokol", "olcek_kod"].filter(c => cols.includes(c)).join(" ")} (NOMINAL).
+${o.f === "genis" ? `
+* Örnek analiz – ön test / son test karşılaştırması (normal dağılım için eşleştirilmiş t, değilse Wilcoxon).
+* EXAMINE VARIABLES=${cols.filter(c => /_fark$/.test(c)).slice(0, 3).join(" ") || "değişken_fark"} /PLOT NPPLOT /STATISTICS DESCRIPTIVES.
+* T-TEST PAIRS=${cols.filter(c => /_T1$/.test(c)).slice(0, 2).join(" ") || "x_T1"} WITH ${cols.filter(c => /_T2$/.test(c)).slice(0, 2).join(" ") || "x_T2"} (PAIRED).
+* NPAR TESTS /WILCOXON=${cols.filter(c => /_T1$/.test(c)).slice(0, 2).join(" ") || "x_T1"} WITH ${cols.filter(c => /_T2$/.test(c)).slice(0, 2).join(" ") || "x_T2"} (PAIRED).
+` : ""}`;
+}
+Object.assign(EXT_ACT, {
+  "grafik": (t, p) => grafikModal(p, t.dataset.key),
+  "rapor": t => raporSecenek(P(t.dataset.hid)),
+  "spss": () => spssModal()
+});
+
+// ===== RANDEVU TAKVİMİ + EV PROGRAMI UYUMU =====
+const GUNLER = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const RDURUM = {planli:["Planlı", "gray"], geldi:["Geldi", "ok"], gelmedi:["Gelmedi", "bad"], iptal:["İptal", "gray"]};
+function isoGun(d){ const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
+function haftaBasi(ofs = 0){ const d = new Date(); d.setHours(12, 0, 0, 0); const g = (d.getDay() + 6) % 7; d.setDate(d.getDate() - g + ofs * 7); return d; }
+function randevular(){ return DB.randevular = DB.randevular || []; }
+function vTakvim(){
+  const ofs = V.hafta || 0, bas = haftaBasi(ofs), gunler = [...Array(7)].map((_, i) => { const d = new Date(bas); d.setDate(d.getDate() + i); return isoGun(d); });
+  const R = randevular().filter(r => r.tarih >= gunler[0] && r.tarih <= gunler[6]).sort((a, b) => (a.saat || "").localeCompare(b.saat || ""));
+  const bugun = today(), son = new Date(bas); son.setDate(son.getDate() + 6);
+  const n = R.filter(r => r.durum !== "iptal").length, sure = R.filter(r => r.durum !== "iptal").reduce((t, r) => t + (+r.sure || 0), 0);
+  return `<div class="head"><div><h1>Takvim</h1><p>${bas.toLocaleDateString("tr-TR", {day:"numeric", month:"long"})} – ${son.toLocaleDateString("tr-TR", {day:"numeric", month:"long", year:"numeric"})} · ${n} randevu · ${Math.round(sure / 6) / 10} saat</p></div>
+   <div class="row"><button class="btn" data-act="hafta" data-d="-1">‹</button><button class="btn" data-act="hafta" data-d="0">Bu hafta</button><button class="btn" data-act="hafta" data-d="1">›</button><button class="btn pri" data-act="randevu-yeni">${ic("plus")} Randevu</button></div></div>
+   <div class="takvim">${gunler.map((g, i) => { const L = R.filter(r => r.tarih === g); return `<div class="tg ${g === bugun ? "bugun" : ""}"><div class="tg-h"><b>${GUNLER[i]}</b><span>${fmtDate(g).slice(0, 5)}</span><button class="icon-btn" data-act="randevu-yeni" data-tarih="${g}" title="Bu güne randevu">${ic("plus")}</button></div>
+     ${L.map(r => { const h = P(r.hid); return `<div class="rv ${r.durum}" data-act="randevu-ac" data-id="${r.id}"><div class="rv-s">${esc(r.saat || "")}${r.sure ? ` · ${r.sure} dk` : ""}</div><div class="rv-a">${esc(h ? h.ad : "Silinmiş hasta")}</div>${h ? `<div class="rv-n">${esc(condNames(h).split(",")[0] || "")}</div>` : ""}${r.durum !== "planli" ? `<span class="rv-d">${RDURUM[r.durum][0]}</span>` : ""}</div>`; }).join("") || `<div class="tg-bos"></div>`}</div>`; }).join("")}</div>`;
+}
+function panelRandevu(){
+  const L = randevular().filter(r => r.tarih === today() && r.durum !== "iptal").sort((a, b) => (a.saat || "").localeCompare(b.saat || ""));
+  const not = typeof syncPanelNot === "function" ? syncPanelNot() : "";
+  if (!L.length) return not;
+  return not + `<div class="card" style="margin-bottom:14px"><div class="sec-t"><h2>Bugünkü randevular</h2><button class="btn ghost sm" data-go="takvim">Takvim</button></div><div class="list">${L.map(r => { const h = P(r.hid); if (!h) return ""; return `<div class="li"><div class="avatar" style="background:var(--teal2);color:var(--teal);font-family:var(--f-m);font-size:12px">${esc(r.saat || "—")}</div><div class="sp" data-act="open-patient" data-hid="${h.id}" style="cursor:pointer"><div class="t">${esc(h.ad)}</div><div class="s">${esc(condNames(h) || "")}${r.not ? " · " + esc(r.not) : ""}</div></div>${r.durum === "geldi" ? `<span class="tag" style="background:var(--green2);color:var(--green)">Seans yapıldı</span>` : `<button class="btn sm pri" data-act="start-session" data-hid="${h.id}">${ic("play")} Seans</button>`}</div>`; }).join("")}</div></div>`;
+}
+function randevuForm(r = {}, pref = {}){
+  const yeni = !r.id, hid = r.hid || pref.hid || V.hid || "";
+  if (!DB.hastalar.length){ toast("Önce hasta ekleyin"); return; }
+  modal(yeni ? "Yeni randevu" : "Randevu", `<label class="f">Hasta<select id="rv-h">${DB.hastalar.map(h => `<option value="${h.id}" ${h.id === hid ? "selected" : ""}>${esc(h.ad)}</option>`).join("")}</select></label>
+   <div class="grid g3" style="margin-top:10px"><label class="f">Tarih<input type="date" id="rv-t" value="${r.tarih || pref.tarih || today()}"></label><label class="f">Saat<input type="time" id="rv-s" value="${r.saat || "10:00"}"></label><label class="f">Süre (dk)<input type="number" id="rv-d" value="${r.sure || 45}" min="5" step="5"></label></div>
+   ${yeni ? `<h3 style="margin:14px 0 6px">Tekrarla (isteğe bağlı)</h3><div class="chips">${GUNLER.map((g, i) => `<label class="chip" style="cursor:pointer"><input type="checkbox" class="rv-g" value="${i}" style="width:auto;margin-right:4px">${g}</label>`).join("")}</div>
+     <label class="f" style="margin-top:8px;width:220px">Kaç hafta<input type="number" id="rv-w" value="1" min="1" max="26"></label><p class="small muted" style="margin:4px 0 0">Gün seçersen seçilen tarihin haftasından başlayarak her hafta bu günlere aynı saatte randevu oluşturulur (ör. Pzt-Çar-Cum, 4 hafta = 12 randevu).</p>` :
+     `<label class="f" style="margin-top:10px">Durum<select id="rv-du">${Object.entries(RDURUM).map(([k, [l]]) => `<option value="${k}" ${k === r.durum ? "selected" : ""}>${l}</option>`).join("")}</select></label>`}
+   <label class="f" style="margin-top:10px">Not<input type="text" id="rv-n" value="${esc(r.not || "")}" placeholder="Ör. kontrol değerlendirmesi, ortez provası…"></label>`,
+   `${yeni ? "" : `<button class="btn danger ghost" id="rv-del">${ic("trash")} Sil</button><button class="btn" id="rv-ses">${ic("play")} Seans başlat</button><button class="btn" id="rv-hasta">Hastayı aç</button>`}<span class="sp"></span><button class="btn" data-act="close-modal">Vazgeç</button><button class="btn pri" id="rv-ok">Kaydet</button>`);
+  document.querySelectorAll(".rv-g").forEach(c => c.onchange = () => c.closest(".chip").classList.toggle("on", c.checked));
+  $("#rv-ok").onclick = () => {
+    const base = {hid:$("#rv-h").value, saat:$("#rv-s").value, sure:+$("#rv-d").value || 45, not:$("#rv-n").value.trim()};
+    if (!yeni){ Object.assign(r, base, {tarih:$("#rv-t").value || r.tarih, durum:$("#rv-du").value}); save(); closeModal(); render(); toast("Randevu güncellendi"); return; }
+    const t0 = $("#rv-t").value || today(), gs = [...document.querySelectorAll(".rv-g:checked")].map(x => +x.value), w = Math.max(1, Math.min(26, +$("#rv-w").value || 1));
+    const tarihler = gs.length ? (() => { const out = [], b = new Date(t0 + "T12:00"); b.setDate(b.getDate() - (b.getDay() + 6) % 7); for (let k = 0; k < w; k++) gs.forEach(g => { const d = new Date(b); d.setDate(d.getDate() + k * 7 + g); const s = isoGun(d); if (s >= t0) out.push(s); }); return out.sort(); })() : [t0];
+    tarihler.forEach(t => randevular().push(Object.assign({id:uid(), tarih:t, durum:"planli"}, base)));
+    save(); closeModal(); if (V.view === "takvim") render(); toast(tarihler.length > 1 ? `${tarihler.length} randevu oluşturuldu` : "Randevu eklendi");
+  };
+  if (!yeni){
+    $("#rv-del").onclick = () => confirmBox("Randevu silinecek.", () => { DB.randevular = randevular().filter(x => x !== r); (DB.silinen = DB.silinen || {})[r.id] = Date.now(); save(); render(); toast("Silindi"); });
+    $("#rv-ses").onclick = () => { closeModal(); startSession(P(r.hid)); };
+    $("#rv-hasta").onclick = () => { closeModal(); go("hasta", {hid:r.hid, ptab:"ozet"}); };
+  }
+}
+function randevuTamam(hid, tarih){ const r = randevular().find(x => x.hid === hid && x.tarih === tarih && x.durum === "planli"); if (r) r.durum = "geldi"; }
+
+// ---- Ev programı uyumu ----
+const UYUM = [["", "Sorulmadı"], ["100", "Hepsini yaptı (%100)"], ["75", "Çoğunu yaptı (~%75)"], ["50", "Yarısını yaptı (~%50)"], ["25", "Azını yaptı (~%25)"], ["0", "Hiç yapmadı"]];
+function uyumSecim(a){ return `<label class="f" style="margin-top:10px">Son seanstan beri ev programına uyum<select id="s-uyum">${UYUM.map(([v, l]) => `<option value="${v}" ${String(a.uyum ?? "") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>`; }
+function uyumKart(p){
+  const s = (p.seanslar || []).filter(x => x.uyum != null && x.uyum !== "");
+  if (!s.length) return "";
+  const ort = Math.round(s.reduce((t, x) => t + +x.uyum, 0) / s.length), son = +s.at(-1).uyum;
+  return `<div class="card"><div class="sec-t"><h2>Ev programı uyumu</h2><span class="small muted">${s.length} seansta soruldu</span></div><div class="row" style="gap:18px"><div class="stat-mini"><b>%${ort}</b><span>Ortalama</span></div><div class="stat-mini"><b>%${son}</b><span>Son seans</span></div><span class="sp"></span>${spark(s.map(x => ({deger:+x.uyum})), {yon:1})}</div>
+   ${ort < 50 ? `<div class="note warn small" style="margin-top:10px">Uyum düşük: programı sadeleştirmeyi (2–3 temel egzersiz), günlük rutine bağlamayı, hatırlatıcı ve takip çizelgesi kullanmayı ve engelleri (ağrı, zaman, anlaşılırlık) konuşmayı düşün.</div>` : ""}</div>`;
+}
+function uyumCizelge(p){
+  const ex = (p.program?.ev || []).map(x => E(x.eid)).filter(Boolean); if (!ex.length) return "";
+  const cell = "border:1px solid #c9ccd6;padding:6px 4px;text-align:center;width:9%";
+  return `<div style="break-inside:avoid;margin-top:18px"><h3 style="margin:0 0 6px;font-size:15px">Haftalık takip çizelgesi</h3><div style="font-size:12px;color:#555;margin-bottom:6px">Yaptığınız her egzersiz için ilgili güne ✓ koyun ve bir sonraki seansa getirin. Hafta: ____ / ____ / ______</div>
+   <table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr><th style="border:1px solid #c9ccd6;padding:6px;text-align:left">Egzersiz</th>${GUNLER.map(g => `<th style="${cell}">${g}</th>`).join("")}</tr></thead><tbody>${ex.map((e, i) => `<tr><td style="border:1px solid #c9ccd6;padding:6px">${i + 1}. ${esc(e.ad)}</td>${GUNLER.map(() => `<td style="${cell}">&nbsp;</td>`).join("")}</tr>`).join("")}
+   <tr><td style="border:1px solid #c9ccd6;padding:6px">Ağrı (0–10)</td>${GUNLER.map(() => `<td style="${cell}">&nbsp;</td>`).join("")}</tr></tbody></table></div>`;
+}
+Object.assign(EXT_ACT, {
+  "hafta": t => { V.hafta = +t.dataset.d === 0 ? 0 : (V.hafta || 0) + +t.dataset.d; render(); },
+  "randevu-yeni": t => randevuForm({}, {hid:t.dataset.hid, tarih:t.dataset.tarih}),
+  "randevu-ac": t => { const r = randevular().find(x => x.id === t.dataset.id); if (r) randevuForm(r); }
+});
+EXT_CHANGE_FNS.push(t => { if (t.id === "s-uyum" && DB.aktif){ DB.aktif.uyum = t.value === "" ? null : +t.value; save(); return true; } return false; });
+
 // ================= FİZYO SEANS – UYGULAMA =================
 const KEY = "fizyoSeans.v1";
 const $ = s => document.querySelector(s);
@@ -3300,6 +4038,7 @@ const I = {
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>', trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>', up:'<path d="m6 15 6-6 6 6"/>', down:'<path d="m6 9 6 6 6-6"/>',
   print:'<path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M7 14h10v7H7z"/>', dl:'<path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/>', copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/>',
   sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  cal:'<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', cloud:'<path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.2 4.5 4.5 0 0 0 7 18z"/>', brain:'<path d="M12 5a3 3 0 0 0-5.6 1.4A3 3 0 0 0 4.5 12a3 3 0 0 0 2.2 5A3 3 0 0 0 12 19zM12 5a3 3 0 0 1 5.6 1.4A3 3 0 0 1 19.5 12a3 3 0 0 1-2.2 5A3 3 0 0 1 12 19z"/>', table:'<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15"/>', doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
   pulse:'<path d="M3 12h4l2-6 4 12 2-6h6"/>', clip:'<path d="M9 4h6v3H9z"/><path d="M8 5H5v16h14V5h-3"/><path d="M8 12h8M8 16h5"/>', edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   pause:'<path d="M8 5v14M16 5v14"/>', chart:'<path d="M4 20V4M4 20h16"/><path d="m7 15 4-4 3 3 5-6"/>', back:'<path d="M15 6l-6 6 6 6"/>', person:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.4-7 8-7s7 2.5 8 7"/>'
 };
@@ -3309,7 +4048,7 @@ const ic = (n, cls = "") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none"
 let DB = {ayar:{terapist:"", klinik:"", unvan:"Fizyoterapist"}, hastalar:[], aktif:null};
 let storageOk = true;
 function load(){ try { const r = localStorage.getItem(KEY); if (r) DB = Object.assign(DB, JSON.parse(r)); } catch(e){ storageOk = false; } }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ storageOk = false; } }
+function save(){ try { if (typeof syncMark === "function") syncMark(); localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ storageOk = false; } try { if (typeof syncOnSave === "function") syncOnSave(); } catch(e){} }
 const P = id => byId(DB.hastalar, id);
 
 // ---------- durum ----------
@@ -3342,14 +4081,14 @@ function confirmBox(msg, onYes, yesLabel = "Evet, sil"){
 
 // ================= RENDER =================
 function render(){
-  const navs = [["panel","home","Panel"],["hastalar","users","Hastalar"],["kutuphane","book","Kütüphane"],["seans","play","Seans"],["ayarlar","gear","Ayarlar"]];
+  const navs = [["panel","home","Panel"],["hastalar","users","Hastalar"],["takvim","cal","Takvim"],["kutuphane","book","Kütüphane"],["seans","play","Seans"],["ayarlar","gear","Ayarlar"]];
   const aktif = DB.aktif && P(DB.aktif.hid);
   const nav = navs.map(([v, i, t]) => `<button class="nav ${V.view === v || (v === "hastalar" && V.view === "hasta") ? "on" : ""}" data-go="${v}">${ic(i)}<span>${t}</span>${v === "seans" && aktif ? '<span class="pill">canlı</span>' : ""}</button>`).join("");
   let body = "";
   try {
-    body = ({panel:vPanel, hastalar:vHastalar, hasta:vHasta, kutuphane:vLib, seans:vSeans, ayarlar:vAyar}[V.view] || vPanel)();
+    body = ({panel:vPanel, hastalar:vHastalar, hasta:vHasta, kutuphane:vLib, seans:vSeans, ayarlar:vAyar, takvim:vTakvim}[V.view] || vPanel)();
   } catch (e){ console.error(e); body = `<div class="note red">Bir hata oluştu: ${esc(e.message)}</div>`; }
-  $("#root").innerHTML = `<div class="app"><aside class="side"><div class="brand"><div class="logo"><svg viewBox="0 0 512 512" width="34" height="34" aria-hidden="true"><defs><linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="80" y1="80" x2="430" y2="430"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f7bff"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="#151924"/><g fill="none" stroke="url(#lg)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"><path d="M250 120 C200 100 140 130 140 185 C108 200 104 260 140 282 C130 330 175 365 215 350 C232 380 250 384 256 380 L256 120"/><path d="M262 120 C312 100 372 130 372 185 C404 200 408 260 372 282 C382 330 337 365 297 350 C280 380 262 384 256 380"/><path d="M190 200 C215 205 225 225 220 245"/><path d="M322 200 C297 205 287 225 292 245"/><path d="M175 290 C200 285 215 300 215 320"/><path d="M337 290 C312 285 297 300 297 320"/></g><path d="M256 384 L256 430" stroke="url(#lg)" stroke-width="22" stroke-linecap="round"/><circle cx="400" cy="112" r="20" fill="#e5203a"/></svg></div><div><b>Fizyo Seans</b><small>Tedavi & seans yönetimi</small></div></div>${nav}<div class="foot">${esc(DB.ayar.terapist || "")}${DB.ayar.klinik ? "<br>" + esc(DB.ayar.klinik) : ""}</div></aside><main>${body}</main></div>`;
+  $("#root").innerHTML = `<div class="app"><aside class="side"><div class="brand"><div class="logo"><svg viewBox="0 0 512 512" width="34" height="34" aria-hidden="true"><defs><linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="80" y1="80" x2="430" y2="430"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f7bff"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="#151924"/><g fill="none" stroke="url(#lg)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"><path d="M250 120 C200 100 140 130 140 185 C108 200 104 260 140 282 C130 330 175 365 215 350 C232 380 250 384 256 380 L256 120"/><path d="M262 120 C312 100 372 130 372 185 C404 200 408 260 372 282 C382 330 337 365 297 350 C280 380 262 384 256 380"/><path d="M190 200 C215 205 225 225 220 245"/><path d="M322 200 C297 205 287 225 292 245"/><path d="M175 290 C200 285 215 300 215 320"/><path d="M337 290 C312 285 297 300 297 320"/></g><path d="M256 384 L256 430" stroke="url(#lg)" stroke-width="22" stroke-linecap="round"/><circle cx="400" cy="112" r="20" fill="#e5203a"/></svg></div><div><b>Fizyo Seans</b><small>Tedavi & seans yönetimi</small></div></div>${nav}${typeof syncChip === "function" ? syncChip() : ""}<div class="foot">${esc(DB.ayar.terapist || "")}${DB.ayar.klinik ? "<br>" + esc(DB.ayar.klinik) : ""}</div></aside><main>${body}</main></div>`;
   if (V.view === "seans") tickSession();
   if (V.view === "kutuphane" && V.lib === "analiz") anStart(); else { cancelAnimationFrame(AN.raf); AN.raf = 0; }
 }
@@ -3369,6 +4108,7 @@ function vPanel(){
   ${aktif ? `<div class="note info row" style="margin-bottom:14px"><b>Devam eden seans:</b> ${esc(aktif.ad)} <span class="sp"></span><button class="btn sm pri" data-go="seans">Seansa dön</button></div>` : ""}
   ${!storageOk ? `<div class="note warn" style="margin-bottom:14px">Bu tarayıcıda kalıcı depolama kullanılamıyor; veriler sayfa kapanınca kaybolabilir. Ayarlar'dan yedek indirin.</div>` : ""}
   ${(() => { const due = DB.hastalar.filter(h => ["zaman", "yok"].includes(evalStatus(h).durum) && (h.seanslar || []).length); return due.length ? `<div class="card" style="margin-bottom:14px;border-color:#c4d6fa"><div class="sec-t"><h2>Değerlendirme bekleyenler</h2></div><div class="list">${due.map(h => { const st = evalStatus(h); return `<div class="li" data-act="batch-eval" data-hid="${h.id}"><div class="avatar" style="background:var(--clay2);color:var(--clay)">${esc(initials(h.ad))}</div><div class="sp"><div class="t">${esc(h.ad)}</div><div class="s">${st.durum === "yok" ? "Başlangıç değerlendirmesi yok" : "Son değerlendirme " + fmtDate(st.son)}</div></div><span class="btn sm">Değerlendir</span></div>`; }).join("")}</div></div>` : ""; })()}
+  ${typeof panelRandevu === "function" ? panelRandevu() : ""}
   <div class="grid g4">
     <div class="card stat"><b>${DB.hastalar.length}</b><span>Kayıtlı hasta</span></div>
     <div class="card stat"><b>${bugun}</b><span>Bugünkü seans</span></div>
@@ -3439,17 +4179,17 @@ function newPatient(prefCond){
 function editPatient(p){
   modal("Hasta bilgileri", patientForm(p), `<button class="btn danger ghost" id="pf-del">${ic("trash")} Sil</button><span class="sp"></span><button class="btn" data-act="close-modal">Vazgeç</button><button class="btn pri" id="pf-save">Kaydet</button>`, "lg");
   $("#pf-save").onclick = () => { const d = readPatientForm(); if (!d.ad){ toast("Ad gerekli"); return; } Object.assign(p, d, {guncel:new Date().toISOString()}); save(); closeModal(); render(); toast("Kaydedildi"); };
-  $("#pf-del").onclick = () => confirmBox(`<b>${esc(p.ad)}</b> ve tüm seans/ölçüm kayıtları silinecek.`, () => { DB.hastalar = DB.hastalar.filter(x => x !== p); if (DB.aktif?.hid === p.id) DB.aktif = null; save(); go("hastalar"); toast("Silindi"); });
+  $("#pf-del").onclick = () => confirmBox(`<b>${esc(p.ad)}</b> ve tüm seans/ölçüm kayıtları silinecek.`, () => { DB.hastalar = DB.hastalar.filter(x => x !== p); (DB.silinen = DB.silinen || {})[p.id] = Date.now(); DB.randevular = (DB.randevular || []).filter(r => r.hid !== p.id); if (DB.aktif?.hid === p.id) DB.aktif = null; save(); go("hastalar"); toast("Silindi"); });
 }
 
 // ---------- HASTA DETAY ----------
 function vHasta(){
   const p = P(V.hid); if (!p) return vHastalar();
-  const tabs = [["ozet","Özet"],["deg","Değerlendirme"],["program","Tedavi programı"],["seanslar",`Seanslar (${(p.seanslar || []).length})`]];
-  const content = ({ozet:ptOzet, deg:ptDeg, program:ptProgram, seanslar:ptSeanslar}[V.ptab] || ptOzet)(p);
+  const tabs = [["ozet","Özet"],["deg","Değerlendirme"],["muayene",`Nöro muayene${(p.muayeneler || []).length ? " (" + p.muayeneler.length + ")" : ""}`],["program","Tedavi programı"],["seanslar",`Seanslar (${(p.seanslar || []).length})`]];
+  const content = ({ozet:ptOzet, deg:ptDeg, muayene:ptMuayene, program:ptProgram, seanslar:ptSeanslar}[V.ptab] || ptOzet)(p);
   return `<div class="crumb"><button data-go="hastalar">Hastalar</button> / ${esc(p.ad)}</div>
   <div class="head"><div class="row" style="gap:14px"><div class="avatar" style="width:52px;height:52px;font-size:18px">${esc(initials(p.ad))}</div><div><h1>${esc(p.ad)}</h1><p>${[age(p) ? age(p) + " yaş" : "", p.cins, p.protokol ? "Protokol " + p.protokol : ""].filter(Boolean).map(esc).join(" · ") || "&nbsp;"}</p></div></div>
-  <div class="row">${aiBtn("btn", p.id)}<button class="btn" data-act="edit-patient">${ic("edit")} Düzenle</button>${p.program ? `<button class="btn" data-act="handout">${ic("print")} Hasta çıktısı</button>` : ""}<button class="btn pri" data-act="start-session">${ic("play")} Seans başlat</button></div></div>
+  <div class="row">${aiBtn("btn", p.id)}<button class="btn" data-act="edit-patient">${ic("edit")} Düzenle</button><button class="btn" data-act="rapor" data-hid="${p.id}">${ic("doc")} Rapor</button><button class="btn" data-act="randevu-yeni" data-hid="${p.id}">${ic("cal")} Randevu</button>${p.program ? `<button class="btn" data-act="handout">${ic("print")} Hasta çıktısı</button>` : ""}<button class="btn pri" data-act="start-session">${ic("play")} Seans başlat</button></div></div>
   <div class="tabs">${tabs.map(([k, t]) => `<button class="tab ${V.ptab === k ? "on" : ""}" data-ptab="${k}">${t}</button>`).join("")}</div>
   ${content}`;
 }
@@ -3470,7 +4210,7 @@ function ptOzet(p){
      ${p.uyari ? `<div class="note red" style="white-space:pre-wrap;margin-bottom:10px">${esc(p.uyari)}</div>` : ""}
      ${warns.length ? `<ul style="margin:0;padding-left:18px">${warns.map(w => `<li class="small" style="margin:4px 0">${esc(w)}</li>`).join("")}</ul>` : `<p class="muted small">Protokol seçilince ilgili kırmızı bayraklar burada görünür.</p>`}
    </div></div>
-   <div class="card"><div class="sec-t"><h2>Son ölçümler</h2><button class="btn sm" data-ptab="deg">Tümü</button></div>${measureSummary(p)}</div>`;
+   <div class="card"><div class="sec-t"><h2>Son ölçümler</h2><button class="btn sm" data-ptab="deg">Tümü</button></div>${measureSummary(p)}</div>${typeof uyumKart === "function" ? uyumKart(p) : ""}`;
 }
 
 // ---------- DEĞERLENDİRME ----------
@@ -3545,12 +4285,12 @@ function measureSummary(p, full = false){
     const a = g[k], sc = S(a[0].sid); if (!sc) return "";
     const f = a[0], l = a.at(-1), d = +l.deger - +f.deger;
     const cls = sc.yon === 0 || d === 0 ? "muted" : d * sc.yon > 0 ? "delta-up" : "delta-down";
-    return `<tr><td><b>${esc(sc.ad)}</b>${sc.alt && f.not ? `<div class="small muted">${esc(f.not)}</div>` : ""}</td><td>${esc(scaleLabel(sc, f.deger))}<div class="small muted">${fmtDate(f.tarih)}</div></td><td>${esc(scaleLabel(sc, l.deger))}<div class="small muted">${fmtDate(l.tarih)}</div></td><td class="${cls}">${a.length > 1 ? (d > 0 ? "+" : "") + Math.round(d * 100) / 100 : "—"}</td><td>${anlamBadge(sc, d, a.length)}</td><td>${spark(a, sc)}</td>${full ? `<td><button class="btn sm ghost" data-act="measure-hist" data-key="${esc(k)}">Geçmiş</button></td>` : ""}</tr>`;
+    return `<tr><td><b>${esc(sc.ad)}</b>${sc.alt && f.not ? `<div class="small muted">${esc(f.not)}</div>` : ""}</td><td>${esc(scaleLabel(sc, f.deger))}<div class="small muted">${fmtDate(f.tarih)}</div></td><td>${esc(scaleLabel(sc, l.deger))}<div class="small muted">${fmtDate(l.tarih)}</div></td><td class="${cls}">${a.length > 1 ? (d > 0 ? "+" : "") + Math.round(d * 100) / 100 : "—"}</td><td>${anlamBadge(sc, d, a.length)}</td><td>${spark(a, sc)}</td>${full ? `<td style="white-space:nowrap"><button class="btn sm ghost" data-act="grafik" data-key="${esc(k)}">${ic("chart")} Grafik</button><button class="btn sm ghost" data-act="measure-hist" data-key="${esc(k)}">Geçmiş</button></td>` : ""}</tr>`;
   }).join("")}</tbody></table>`;
 }
 function ptDeg(p){
   const rec = [...new Set((p.condIds || []).flatMap(id => C(id)?.olcek || []))];
-  return `${evalCard(p)}<div class="card"><div class="sec-t"><h2>Ölçümler ve ilerleme</h2><div class="row"><button class="btn sm" data-act="batch-eval" data-hid="${p.id}">${ic("clip")} Toplu değerlendirme</button><button class="btn pri sm" data-act="add-measure">${ic("plus")} Tek ölçüm</button></div></div>${measureSummary(p, true)}
+  return `${evalCard(p)}<div class="card"><div class="sec-t"><h2>Ölçümler ve ilerleme</h2><div class="row"><button class="btn sm" data-act="batch-eval" data-hid="${p.id}">${ic("clip")} Toplu değerlendirme</button><button class="btn pri sm" data-act="add-measure">${ic("plus")} Tek ölçüm</button></div></div>${typeof grafikPanel === "function" ? grafikPanel(p) : ""}${measureSummary(p, true)}
   <p class="small muted" style="margin:10px 0 0">“Yorum” sütunu değişimin ölçüm hatasını (MDC) ve klinik önem eşiğini (MCID) aşıp aşmadığını gösterir; üzerine gelince kaynağı görünür.</p></div>
   ${(p.degNotlari || []).length ? `<div class="card"><h2 style="margin-bottom:8px">Değerlendirme notları</h2>${p.degNotlari.slice().reverse().map(n => `<div class="phase"><b>${fmtDate(n.tarih)}</b><span style="white-space:pre-wrap">${esc(n.metin)}</span></div>`).join("")}</div>` : ""}
   ${rec.length ? `<div class="card"><h2 style="margin-bottom:10px">Bu protokol için önerilen ölçekler</h2><div class="chips">${rec.map(id => `<button class="chip" data-act="add-measure" data-sid="${id}">${ic("plus").replace('<svg', '<svg width="12" height="12" style="vertical-align:-1px"')} ${esc(S(id).ad)}</button>`).join("")}</div></div>` : ""}`;
@@ -3713,6 +4453,7 @@ function handoutHTML(p, standalone = false){
   ${g.hedefler.filter(h => h.vade === "kisa").length ? `<p style="margin:0 0 6px"><b>Hedeflerimiz:</b> ${g.hedefler.filter(h => h.vade === "kisa").slice(0, 3).map(h => esc(h.metin.replace(/\.$/, ""))).join("; ")}.</p>` : ""}
   ${g.evNot ? `<div style="background:#e7effd;color:#123f99;padding:10px 14px;border-radius:8px;margin:10px 0">${esc(g.evNot)}</div>` : ""}
   ${ex || "<p>Egzersiz eklenmemiş.</p>"}
+  ${typeof uyumCizelge === "function" ? uyumCizelge(p) : ""}
   <p style="font-size:12px;color:#666;margin-top:16px">Egzersizler sırasında göğüs ağrısı, ani nefes darlığı, baş dönmesi veya artan ağrı/uyuşma olursa durun ve fizyoterapistinize haber verin.</p>`;
   if (!standalone) return `<div class="handout">${inner}</div>`;
   return `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ev Egzersiz Programı – ${esc(p.ad)}</title><style>body{font-family:-apple-system,"Segoe UI",Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#1c2626;font-size:14px;line-height:1.5}.hx{border:1px solid #ddd;border-radius:10px;padding:12px 14px;margin:10px 0;break-inside:avoid}.hx ol{margin:6px 0 4px;padding-left:20px}.hdose{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#5b2fd4;font-weight:600}.pb{position:fixed;top:12px;right:12px;padding:8px 14px;border-radius:8px;border:0;background:#5b2fd4;color:#fff;font-size:14px;cursor:pointer}@media print{.pb{display:none}body{margin:0}}</style></head><body><button class="pb" onclick="window.print()">Yazdır / PDF</button>${inner}</body></html>`;
@@ -3731,7 +4472,7 @@ async function downloadFile(name, data){
       if (dl){ await dl.save({filename:name, data}); toast("İndirildi"); return; }
     }
   } catch (e){ if (e && e.code === "declined") return; console.warn(e); }
-  try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type: name.endsWith(".json") ? "application/json" : "text/html"})); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+  try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type: ({json:"application/json", csv:"text/csv;charset=utf-8", sps:"text/plain;charset=utf-8", txt:"text/plain;charset=utf-8"})[name.split(".").pop()] || "text/html"})); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
   catch (e){ toast("İndirme bu görünümde desteklenmiyor"); }
 }
 async function copyText(t){ try { await navigator.clipboard.writeText(t); toast("Panoya kopyalandı"); } catch (e){ toast("Kopyalanamadı"); } }
@@ -3815,7 +4556,7 @@ function vSeans(){
      ${a.items.length ? a.items.map(it => `<div class="sitem ${it.yapildi ? "done" : ""} ${it.calisiyor ? "run" : ""}"><span class="check" data-act="s-toggle" data-id="${it.id}">${it.yapildi ? ic("check") : ""}</span><div class="sp"><div style="font-weight:600">${esc(it.ad)}</div>${it.doz ? `<div class="small muted">${esc(it.doz)}</div>` : ""}</div>
        ${it.sure ? `<span class="cd" data-cd="${it.id}">${mmss(Math.ceil(it.kalan ?? it.sure * 60))}</span><button class="icon-btn" data-act="s-timer" data-id="${it.id}" title="Zamanlayıcı">${ic(it.calisiyor ? "pause" : "play")}</button>` : ""}
        <button class="icon-btn" data-act="s-rm" data-id="${it.id}">${ic("x")}</button></div>`).join("") : `<p class="muted small">Programda klinik uygulama yok. “Ekle” ile yöntem ekleyin.</p>`}
-     ${p.program?.ev?.length ? `<label class="row small" style="margin-top:10px;cursor:pointer"><input type="checkbox" id="s-ev" ${a.evGozden ? "checked" : ""}> Ev egzersiz programı gözden geçirildi (${p.program.ev.length} egzersiz)</label>` : ""}
+     ${p.program?.ev?.length ? `<label class="row small" style="margin-top:10px;cursor:pointer"><input type="checkbox" id="s-ev" ${a.evGozden ? "checked" : ""}> Ev egzersiz programı gözden geçirildi (${p.program.ev.length} egzersiz)</label>${typeof uyumSecim === "function" ? uyumSecim(a) : ""}` : ""}
     </div>
     <div class="card"><h2 style="margin-bottom:10px">Seans sonrası</h2>${vitalsRow("sonrasi", a.sonrasi)}</div>
    </div>
@@ -3831,8 +4572,9 @@ function vSeans(){
 function finishSession(){
   const a = DB.aktif, p = P(a.hid);
   a.items.forEach(i => i.calisiyor = false);
-  const s = {id:a.id, no:(p.seanslar || []).length + 1, tarih:a.tarih, baslangic:a.baslangic, bitis:new Date().toTimeString().slice(0, 5), sureDk:Math.max(1, Math.round((Date.now() - a.baslangicTs) / 60000)), oncesi:a.oncesi, sonrasi:a.sonrasi, uygulanan:a.items.map(i => ({ad:i.ad, mid:i.mid, sure:i.sure, doz:i.doz, yapildi:i.yapildi})), soap:a.soap, evGozden:a.evGozden};
+  const s = {id:a.id, no:(p.seanslar || []).length + 1, tarih:a.tarih, baslangic:a.baslangic, bitis:new Date().toTimeString().slice(0, 5), sureDk:Math.max(1, Math.round((Date.now() - a.baslangicTs) / 60000)), oncesi:a.oncesi, sonrasi:a.sonrasi, uygulanan:a.items.map(i => ({ad:i.ad, mid:i.mid, sure:i.sure, doz:i.doz, yapildi:i.yapildi})), soap:a.soap, evGozden:a.evGozden, uyum:a.uyum ?? null};
   p.seanslar = p.seanslar || []; p.seanslar.push(s);
+  if (typeof randevuTamam === "function") randevuTamam(p.id, a.tarih);
   if (a.oncesi.vas !== undefined && a.oncesi.vas !== "") (p.olcumler = p.olcumler || []).push({id:uid(), sid:"s_vas", deger:+a.oncesi.vas, tarih:a.tarih, not:"seans öncesi"});
   p.guncel = new Date().toISOString(); DB.aktif = null; save();
   go("hasta", {hid:p.id, ptab:"seanslar"}); toast(`Seans #${s.no} kaydedildi`);
@@ -3985,8 +4727,10 @@ function vAyar(){
   return `<div class="head"><div><h1>Ayarlar</h1><p>Profil, yedekleme ve veri</p></div></div>
   <div class="card"><h2 style="margin-bottom:12px">Terapist bilgileri</h2><p class="small muted" style="margin-top:-6px">Hasta çıktısının başlığında görünür.</p>
    <div class="grid g3"><label class="f">Ad Soyad<input type="text" data-ayar="terapist" value="${esc(DB.ayar.terapist)}"></label><label class="f">Unvan<input type="text" data-ayar="unvan" value="${esc(DB.ayar.unvan)}"></label><label class="f">Klinik / kurum<input type="text" data-ayar="klinik" value="${esc(DB.ayar.klinik)}"></label></div></div>
+  ${typeof syncAyarKart === "function" ? syncAyarKart() : ""}
   ${aiAyarKart()}
-  <div class="card"><h2 style="margin-bottom:6px">Yedekleme</h2><p class="small muted" style="margin-top:0">Veriler yalnızca bu tarayıcıda saklanır (${size} KB). Tarayıcı verisi silinirse kaybolur – düzenli yedek alın. Yedek dosyasını başka bir cihazda “Yedeği yükle” ile açabilirsiniz.</p>
+  ${typeof spssKart === "function" ? spssKart() : ""}
+  <div class="card"><h2 style="margin-bottom:6px">Yedekleme</h2><p class="small muted" style="margin-top:0">Veriler bu tarayıcıda saklanır (${size} KB)${typeof SYNC !== "undefined" && SYNC.bagli ? " ve Google Drive ile eşitlenir" : ""}. Tarayıcı verisi silinirse kaybolur – Drive senkronu kapalıysa düzenli yedek alın. Yedek dosyasını başka bir cihazda “Yedeği yükle” ile açabilirsiniz.</p>
    <div class="row"><button class="btn pri" data-act="backup">${ic("dl")} Yedeği indir (.json)</button><label class="btn">${ic("up")} Yedeği yükle<input type="file" id="restore" accept=".json,application/json" hidden></label><button class="btn" data-act="backup-copy">${ic("copy")} Yedeği kopyala</button></div></div>
   <div class="card"><h2 style="margin-bottom:6px">Gizlilik</h2><p class="small" style="margin:0">Hasta verileri sağlık verisidir (KVKK özel nitelikli veri). Uygulama verileri hiçbir sunucuya göndermez (yalnızca “Claude'a sor” ile gönderdiğin anonim özet Claude'a gider); yine de mümkünse ad yerine baş harf / protokol no kullanın ve yedek dosyalarını güvenli saklayın.</p></div>
   <div class="card"><h2 style="margin-bottom:6px">Örnek veri</h2><p class="small muted" style="margin-top:0">Uygulamayı denemek için kurgusal bir örnek hasta ekler.</p><button class="btn" data-act="demo">Örnek hasta ekle</button>
@@ -4071,9 +4815,9 @@ document.addEventListener("click", e => {
     "backup": () => downloadFile(`fizyo-seans-yedek-${today()}.json`, JSON.stringify(DB, null, 1)),
     "backup-copy": () => copyText(JSON.stringify(DB)),
     "demo": () => addDemo(),
-    "wipe": () => confirmBox("Tüm hastalar, programlar ve seanslar kalıcı olarak silinecek. Önce yedek almanız önerilir.", () => { DB = {ayar:DB.ayar, hastalar:[], aktif:null}; save(); go("panel"); toast("Veriler silindi"); }, "Hepsini sil")
+    "wipe": () => confirmBox("Tüm hastalar, programlar ve seanslar kalıcı olarak silinecek. Önce yedek almanız önerilir.", () => { const sil = DB.silinen || {}; DB.hastalar.forEach(h => sil[h.id] = Date.now()); DB = {ayar:DB.ayar, hastalar:[], aktif:null, randevular:[], silinen:sil}; save(); go("panel"); toast("Veriler silindi"); }, "Hepsini sil")
   };
-  (A[act] || (() => {}))();
+  if (A[act]) A[act](); else if (typeof EXT_ACT !== "undefined" && EXT_ACT[act]) EXT_ACT[act](t, p, e);
 });
 document.addEventListener("input", e => {
   const t = e.target, p = P(V.hid);
@@ -4088,20 +4832,22 @@ document.addEventListener("input", e => {
   if (t.dataset.soap){ DB.aktif.soap[t.dataset.soap] = t.value; save(); return; }
   if (t.dataset.vit){ DB.aktif[t.dataset.vit][t.dataset.k] = t.value; save(); const w = $("#w-" + t.dataset.vit); if (w) w.innerHTML = warnHTML(DB.aktif[t.dataset.vit]); return; }
   if (t.dataset.ayar){ DB.ayar[t.dataset.ayar] = t.value; save(); return; }
+  if (typeof EXT_INPUT === "function") EXT_INPUT(t, p, e);
 });
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.closest("#pc-list") && t.type === "checkbox"){ t.closest(".pick").classList.toggle("on", t.checked); return; }
   if (t.dataset.hgs){ const p = P(V.hid), h = p.program.hedefler.find(x => x.id === t.dataset.id); if (h){ h[t.dataset.hgs] = t.value; if (t.dataset.hgs === "durum" && t.value !== "ulasildi" && h.olcek) h.olcek = h.olcek; save(); render(); } return; }
   if (t.id === "s-ev"){ DB.aktif.evGozden = t.checked; save(); return; }
+  if (typeof EXT_CHANGE === "function" && EXT_CHANGE(t, P(V.hid), e)) return;
   if (t.id === "restore" && t.files[0]){
     const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!Array.isArray(d.hastalar)) throw 0;
-      confirmBox(`Yedekte ${d.hastalar.length} hasta var. Mevcut veriler bu yedekle <b>değiştirilecek</b>.`, () => { DB = Object.assign({ayar:{}, hastalar:[], aktif:null}, d); migrate(); save(); go("panel"); toast("Yedek yüklendi"); }, "Yükle"); } catch (err){ toast("Geçersiz yedek dosyası"); } };
+      confirmBox(`Yedekte ${d.hastalar.length} hasta var. Mevcut veriler bu yedekle <b>değiştirilecek</b>.`, () => { DB = Object.assign({ayar:{}, hastalar:[], aktif:null, randevular:[], silinen:{}}, d); migrate(); save(); go("panel"); toast("Yedek yüklendi"); }, "Yükle"); } catch (err){ toast("Geçersiz yedek dosyası"); } };
     r.readAsText(t.files[0]); t.value = "";
   }
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#ov")) closeModal(); });
 
-load(); migrate(); render();
+load(); migrate(); render(); if (typeof syncInit === "function") syncInit();
 
 </script></body></html>
