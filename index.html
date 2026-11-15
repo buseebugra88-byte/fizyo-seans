@@ -289,6 +289,17 @@ select.mu.chg,input.mu.chg{outline:2px solid #7c5cff;outline-offset:1px}
 .faz-adim.bitti{opacity:.6}
 .faz-adim:hover{border-color:var(--fc)}
 @media (max-width:860px){.faz-yol{grid-template-columns:1fr 1fr}}
+.ank-d>summary{cursor:pointer;color:var(--teal);font-weight:600}
+.ank{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:6px;background:#fafbfc}
+.ank-m{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.ank-m select{height:30px;padding:3px 6px;font-size:12.5px}
+.ank-t{margin-top:8px;font-size:13px}.ank-t b{font-family:var(--f-m);font-size:16px;color:var(--teal)}
+@media (max-width:860px){.ank-m{grid-template-columns:1fr}}
+.vaka-fmt h3.vh{display:flex;align-items:center;gap:10px;margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);font-size:13px}
+.vaka-fmt h3.vh span{background:var(--ink);color:#fff;font:600 11px var(--f-m);width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;letter-spacing:0}
+table.prob td{vertical-align:top}
+.chip.sm{padding:3px 8px;font-size:11.5px}
+.chip.ghost{background:transparent;border-style:dashed}
 </style></head><body><div id="root"></div><script>
 // ===== TEDAVİ YÖNTEMLERİ =====
 const YONTEM_KAT = {
@@ -4311,6 +4322,347 @@ function openVaka(v){
 }
 Object.assign(EXT_ACT, {"open-vaka": t => openVaka(VAKALAR.find(v => v.id === t.dataset.id))});
 
+// ===== ANKET / FORM TABANLI ÖLÇEKLER (madde madde doldur, otomatik puanla) =====
+// Madde ifadeleri kısaltılmış ve özetlenmiştir; resmi Türkçe form klinik kayıt için esas alınmalıdır.
+const G5 = ["Sorun yok", "Hafif", "Orta", "Belirgin", "Ciddi", "En ağır / yapamıyor"].map((l, i) => [i, l]);
+const BERG = (l4, l3, l2, l1, l0) => [[4, l4], [3, l3], [2, l2], [1, l1], [0, l0]];
+const ANKET = {
+ s_berg:{hesap:"toplam", maddeler:[
+  ["1. Oturmadan ayağa kalkma", BERG("Ellerini kullanmadan, bağımsız ve stabil", "Ellerini kullanarak bağımsız", "Birkaç denemede, ellerle", "Minimal yardımla", "Orta–maksimal yardım")],
+  ["2. Desteksiz ayakta durma (2 dk)", BERG("Güvenle 2 dk", "Gözetimle 2 dk", "Desteksiz 30 sn", "Birkaç denemede 30 sn", "30 sn duramıyor")],
+  ["3. Desteksiz oturma (2 dk, ayaklar yerde)", BERG("Güvenle 2 dk", "Gözetimle 2 dk", "30 sn", "10 sn", "10 sn oturamıyor")],
+  ["4. Ayaktan oturmaya geçiş", BERG("Ellerini az kullanarak, güvenli", "Ellerle kontrol ederek", "Bacak arkasını sandalyeye dayayarak", "Bağımsız ama kontrolsüz iniş", "Yardım gerekli")],
+  ["5. Transfer", BERG("Elleri az kullanarak güvenli", "Ellerle güvenli", "Sözel ipucu / gözetimle", "Bir kişi yardımıyla", "İki kişi yardımıyla")],
+  ["6. Gözler kapalı ayakta durma (10 sn)", BERG("10 sn güvenli", "Gözetimle 10 sn", "3 sn", "Gözlerini 3 sn kapatamıyor, stabil", "Düşmemek için yardım")],
+  ["7. Ayaklar bitişik ayakta durma (1 dk)", BERG("Bağımsız 1 dk", "Gözetimle 1 dk", "Bağımsız ama 30 sn tutamıyor", "Yardımla pozisyon, 15 sn", "Yardımla pozisyon, 15 sn tutamıyor")],
+  ["8. Kol önde, öne uzanma", BERG("> 25 cm güvenli", "> 12 cm", "> 5 cm", "Uzanıyor, gözetim gerekli", "Denge kaybı / dış destek")],
+  ["9. Yerden nesne alma", BERG("Kolay ve güvenli", "Gözetimle alıyor", "2–5 cm kala alamıyor, dengede", "Alamıyor, gözetim gerekli", "Deneyemiyor / yardım")],
+  ["10. Omuz üzerinden geriye bakma", BERG("İki yana, iyi ağırlık aktarımıyla", "Bir yana iyi, diğer yana az", "Yalnızca yana, denge korunuyor", "Dönerken gözetim", "Yardım gerekli")],
+  ["11. 360° dönme", BERG("Her iki yöne ≤ 4 sn", "Yalnız bir yöne ≤ 4 sn", "Güvenli ama yavaş", "Yakın gözetim / sözel ipucu", "Yardım gerekli")],
+  ["12. Basamağa sırayla ayak koyma (8 kez)", BERG("Bağımsız, 20 sn'de 8", "Bağımsız, > 20 sn'de 8", "Gözetimle 4 kez", "Minimal yardımla > 2 kez", "Yardım / düşme riski")],
+  ["13. Tandem (bir ayak önde) durma", BERG("Tandem 30 sn", "Bir ayak önde (tandem değil) 30 sn", "Küçük adım, 30 sn", "Adım için yardım, 15 sn", "Denge kaybı")],
+  ["14. Tek ayak üzerinde durma", BERG("> 10 sn", "5–10 sn", "≥ 3 sn", "Kaldırıyor, 3 sn tutamıyor", "Deneyemiyor / yardım")]]},
+ s_barthel:{hesap:"toplam", maddeler:[
+  ["Beslenme", [[10, "Bağımsız"], [5, "Yardımla (kesme, yayma)"], [0, "Bağımlı"]]],
+  ["Banyo", [[5, "Bağımsız"], [0, "Bağımlı"]]],
+  ["Kişisel bakım (yüz, saç, diş, tıraş)", [[5, "Bağımsız"], [0, "Yardım gerekli"]]],
+  ["Giyinme", [[10, "Bağımsız"], [5, "Yarısını kendisi yapıyor"], [0, "Bağımlı"]]],
+  ["Bağırsak kontrolü", [[10, "Kontinan"], [5, "Ara sıra kaçırma"], [0, "İnkontinan"]]],
+  ["Mesane kontrolü", [[10, "Kontinan"], [5, "Ara sıra kaçırma"], [0, "İnkontinan / kateter"]]],
+  ["Tuvalet kullanımı", [[10, "Bağımsız"], [5, "Biraz yardım"], [0, "Bağımlı"]]],
+  ["Transfer (yatak–sandalye)", [[15, "Bağımsız"], [10, "Minimal yardım / gözetim"], [5, "Büyük yardım, oturabiliyor"], [0, "Oturma dengesi yok"]]],
+  ["Mobilite (düz zeminde)", [[15, "Bağımsız (yardımcı cihazla olabilir) > 50 m"], [10, "Bir kişi yardımıyla > 50 m"], [5, "Tekerlekli sandalyede bağımsız > 50 m"], [0, "Hareketsiz / < 50 m"]]],
+  ["Merdiven", [[10, "Bağımsız"], [5, "Yardımla"], [0, "Çıkamıyor"]]]]},
+ s_oswestry:{hesap:"odi", maddeler:["Ağrı şiddeti", "Kişisel bakım", "Yük kaldırma", "Yürüme", "Oturma", "Ayakta durma", "Uyku", "Cinsel yaşam (isteğe bağlı)", "Sosyal yaşam", "Seyahat"].map(t => [t, G5])},
+ s_ndi:{hesap:"toplam", maddeler:["Ağrı şiddeti", "Kişisel bakım", "Yük kaldırma", "Okuma", "Baş ağrısı", "Konsantrasyon", "İş", "Araba kullanma", "Uyku", "Eğlence / boş zaman"].map(t => [t, G5])},
+ s_dash:{hesap:"qdash", not:"QuickDASH (11 madde) ile hesaplanır; en az 10 madde yanıtlanmalı.", maddeler:[
+  ...["Sıkı bir kavanozu açmak", "Ağır ev işleri (duvar, yer silme)", "Alışveriş çantası taşımak", "Sırtını yıkamak", "Ekmek/yiyecek kesmek için bıçak kullanmak", "Kola güç binen boş zaman aktiviteleri (raket, çekiç)"].map(t => [t, [[1, "Zorluk yok"], [2, "Hafif zorluk"], [3, "Orta zorluk"], [4, "Çok zorluk"], [5, "Yapamıyorum"]]]),
+  ["Kol/omuz/el sorununun sosyal aktivitelere etkisi (son hafta)", [[1, "Hiç"], [2, "Biraz"], [3, "Orta"], [4, "Oldukça"], [5, "Aşırı"]]],
+  ["İş / günlük işlerde kısıtlılık (son hafta)", [[1, "Hiç"], [2, "Biraz"], [3, "Orta"], [4, "Çok"], [5, "Yapamıyorum"]]],
+  ["Kol/omuz/el ağrısı", [[1, "Yok"], [2, "Hafif"], [3, "Orta"], [4, "Şiddetli"], [5, "Aşırı"]]],
+  ["Karıncalanma / iğnelenme", [[1, "Yok"], [2, "Hafif"], [3, "Orta"], [4, "Şiddetli"], [5, "Aşırı"]]],
+  ["Ağrı nedeniyle uyku güçlüğü", [[1, "Yok"], [2, "Hafif"], [3, "Orta"], [4, "Ciddi"], [5, "Uyuyamıyorum"]]]]},
+ s_eat10:{hesap:"toplam", maddeler:["Yutma sorunu kilo kaybına yol açtı", "Yutma sorunu dışarıda yemek yemeyi etkiliyor", "Sıvıları yutmak çaba gerektiriyor", "Katıları yutmak çaba gerektiriyor", "Hap yutmak çaba gerektiriyor", "Yutmak ağrılı", "Yemek yeme zevkini etkiliyor", "Yutunca boğazda takılma hissi", "Yerken öksürüyorum", "Yutmak stres yaratıyor"].map(t => [t, [[0, "Sorun yok"], [1, "1"], [2, "2"], [3, "3"], [4, "Ciddi sorun"]]])},
+ s_cat:{hesap:"toplam", maddeler:[["Öksürük", "Hiç öksürmem ↔ Sürekli öksürürüm"], ["Balgam", "Hiç balgam yok ↔ Göğsüm balgamla dolu"], ["Göğüste sıkışma", "Yok ↔ Çok fazla"], ["Yokuş / bir kat merdivende nefes darlığı", "Nefesim daralmaz ↔ Çok daralır"], ["Evdeki aktivitelerde kısıtlılık", "Kısıtlı değilim ↔ Çok kısıtlıyım"], ["Evden çıkma konusunda kendine güven", "Güvenirim ↔ Hiç güvenmem"], ["Uyku", "Rahat uyurum ↔ Akciğerim yüzünden uyuyamam"], ["Enerji", "Çok enerjiğim ↔ Hiç enerjim yok"]].map(([t, a]) => [t + " (" + a + ")", [0, 1, 2, 3, 4, 5].map(i => [i, String(i)])])},
+ s_abc:{hesap:"ortalama", not:"Her aktivite için ‘denge kaybetmeden yapabileceğinize ne kadar güveniyorsunuz?’ 0–100%.", maddeler:["Ev içinde yürüme", "Merdiven inip çıkma", "Eğilip yerden terlik alma", "Göz hizasındaki raftan küçük kutu alma", "Parmak ucunda yükselip baş üstü raftan bir şey alma", "Sandalyeye çıkıp bir şeye uzanma", "Yer süpürme", "Evden çıkıp park etmiş arabaya yürüme", "Arabaya binip inme", "Otoparktan alışveriş merkezine yürüme", "Rampadan inip çıkma", "Kalabalık alışveriş merkezinde yürüme", "Kalabalıkta insanlar çarparken yürüme", "Tırabzana tutunarak yürüyen merdivene binme", "Paket taşırken, tutunmadan yürüyen merdivene binme", "Buzlu kaldırımda yürüme"].map(t => [t, [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(v => [v, "%" + v])])},
+ s_fogq:{hesap:"toplam", maddeler:[
+  ["En kötü durumdayken yürüyüşü", [[0, "Normal"], [1, "Neredeyse normal, biraz yavaş"], [2, "Yavaş ama bağımsız"], [3, "Yardım ya da cihaz gerekli"], [4, "Yürüyemiyor"]]],
+  ["Yürüme güçlüğünün günlük yaşama etkisi", [[0, "Hiç"], [1, "Hafif"], [2, "Orta"], [3, "Ciddi"], [4, "Yürüyemiyor"]]],
+  ["Ayakların yere yapışmış gibi hissetmesi (donma)", [[0, "Hiç"], [1, "Çok nadir (ayda 1)"], [2, "Nadiren (haftada 1)"], [3, "Sık (günde 1)"], [4, "Her yürüyüşte"]]],
+  ["En uzun donma epizodu", [[0, "Hiç olmadı"], [1, "1–2 sn"], [2, "3–10 sn"], [3, "11–30 sn"], [4, "> 30 sn yürüyemiyor"]]],
+  ["Yürümeye başlarken donma süresi", [[0, "Yok"], [1, "> 1 sn"], [2, "> 3 sn"], [3, "> 10 sn"], [4, "> 30 sn"]]],
+  ["Dönerken donma süresi", [[0, "Yok"], [1, "1–2 sn"], [2, "3–10 sn"], [3, "11–30 sn"], [4, "> 30 sn"]]]]},
+ s_dgi:{hesap:"toplam", maddeler:["Düz zeminde yürüme", "Yürürken hız değiştirme", "Yürürken başı yatay çevirme", "Yürürken başı dikey hareket ettirme", "Yürürken 180° dönüp durma", "Engel (ayakkabı kutusu) üzerinden adımlama", "Engellerin etrafından dolaşma", "Merdiven"].map(t => [t, [[3, "Normal"], [2, "Hafif bozukluk"], [1, "Orta bozukluk"], [0, "Ciddi bozukluk"]]])},
+ s_fga:{hesap:"toplam", maddeler:["Düz zeminde yürüme (30 cm şerit içinde)", "Hız değiştirme", "Başı yatay çevirerek yürüme", "Başı dikey hareket ettirerek yürüme", "Yürürken 180° dönüp durma", "Engel üzerinden adımlama", "Dar tabanla (tandem) yürüme", "Gözler kapalı yürüme", "Geri geri yürüme", "Merdiven"].map(t => [t, [[3, "Normal"], [2, "Hafif bozukluk"], [1, "Orta bozukluk"], [0, "Ciddi bozukluk"]]])},
+ s_tinetti:{hesap:"toplam", maddeler:[
+  ["D1. Oturma dengesi", [[1, "Dik, güvenli"], [0, "Eğiliyor / kayıyor"]]],
+  ["D2. Ayağa kalkma", [[2, "Kolsuz kalkıyor"], [1, "Kollarla kalkıyor"], [0, "Yardımsız kalkamıyor"]]],
+  ["D3. Kalkma denemeleri", [[2, "Tek denemede"], [1, "> 1 deneme"], [0, "Yardımsız kalkamıyor"]]],
+  ["D4. İlk 5 sn ayakta denge", [[2, "Stabil, destek yok"], [1, "Stabil, destekle"], [0, "Dengesiz"]]],
+  ["D5. Ayakta denge", [[2, "Dar taban, desteksiz"], [1, "Geniş taban ya da destek"], [0, "Dengesiz"]]],
+  ["D6. Göğüse itme (3 kez)", [[2, "Stabil"], [1, "Sendeliyor, toparlıyor"], [0, "Düşmeye başlıyor"]]],
+  ["D7. Gözler kapalı", [[1, "Stabil"], [0, "Dengesiz"]]],
+  ["D8a. 360° dönme – adımlar", [[1, "Sürekli adımlar"], [0, "Kesik adımlar"]]],
+  ["D8b. 360° dönme – denge", [[1, "Stabil"], [0, "Dengesiz"]]],
+  ["D9. Oturma", [[2, "Güvenli, akıcı"], [1, "Kollarla / akıcı değil"], [0, "Güvensiz (düşer gibi oturma)"]]],
+  ["Y1. Yürümeye başlama", [[1, "Tereddütsüz"], [0, "Tereddüt / birkaç deneme"]]],
+  ["Y2. Sağ ayak salınımda sol ayağı geçiyor", [[1, "Evet"], [0, "Hayır"]]],
+  ["Y3. Sağ ayak yerden tam kalkıyor", [[1, "Evet"], [0, "Hayır"]]],
+  ["Y4. Sol ayak salınımda sağ ayağı geçiyor", [[1, "Evet"], [0, "Hayır"]]],
+  ["Y5. Sol ayak yerden tam kalkıyor", [[1, "Evet"], [0, "Hayır"]]],
+  ["Y6. Adım simetrisi", [[1, "Eşit"], [0, "Eşit değil"]]],
+  ["Y7. Adım devamlılığı", [[1, "Sürekli"], [0, "Duraklama / kesik"]]],
+  ["Y8. Yol (3 m)", [[2, "Düz, yardımcısız"], [1, "Hafif sapma / yardımcı cihaz"], [0, "Belirgin sapma"]]],
+  ["Y9. Gövde", [[2, "Salınım yok, destek yok"], [1, "Gövde/kol açılması ya da diz fleksiyonu"], [0, "Belirgin salınım / yardımcı cihaz"]]],
+  ["Y10. Yürüme tabanı", [[1, "Topuklar neredeyse değiyor"], [0, "Geniş taban"]]]]},
+ s_lysholm:{hesap:"toplam", maddeler:[
+  ["Topallama", [[5, "Yok"], [3, "Hafif / ara sıra"], [0, "Ağır / sürekli"]]],
+  ["Destek (baston, koltuk değneği)", [[5, "Yok"], [2, "Baston / koltuk değneği"], [0, "Yük veremiyor"]]],
+  ["Kilitlenme", [[15, "Kilitlenme / takılma yok"], [10, "Takılma var, kilitlenme yok"], [6, "Ara sıra kilitlenme"], [2, "Sık kilitlenme"], [0, "Muayenede kilitli"]]],
+  ["İnstabilite (boşalma)", [[25, "Hiç"], [20, "Nadiren, sporda/ağır eforda"], [15, "Sık, sporda/ağır eforda"], [10, "Ara sıra günlük yaşamda"], [5, "Sık günlük yaşamda"], [0, "Her adımda"]]],
+  ["Ağrı", [[25, "Yok"], [20, "Ağır eforda ara sıra, hafif"], [15, "Ağır eforda belirgin"], [10, "> 2 km yürüyüşte belirgin"], [5, "< 2 km yürüyüşte belirgin"], [0, "Sürekli"]]],
+  ["Şişlik", [[10, "Yok"], [6, "Ağır eforda"], [2, "Hafif eforda"], [0, "Sürekli"]]],
+  ["Merdiven", [[10, "Sorun yok"], [6, "Hafif zorluk"], [2, "Basamak basamak"], [0, "İmkânsız"]]],
+  ["Çömelme", [[5, "Sorun yok"], [4, "Hafif zorluk"], [2, "90°'yi geçemiyor"], [0, "İmkânsız"]]]]},
+ s_pdfs:{hesap:"ortalama", maddeler:["Kendimi daha kolay yoruluyorum", "Gün içinde dinlenmem gerekiyor", "Yorgunluk günlük işleri yapmamı engelliyor", "Kendimi bitkin hissediyorum", "Yorgunluk nedeniyle sosyal yaşamım kısıtlı", "Bir işi bitirmek daha uzun sürüyor", "Her şey çaba gerektiriyor", "Yorgunluk nedeniyle daha az şey yapıyorum", "Bir işe başlamakta güçlük çekiyorum", "Bir şeyi yapınca toparlanmam uzun sürüyor", "Yorgunluk yürüyüşümü etkiliyor", "Kendimi zayıf hissediyorum", "Yorgunluk nedeniyle evden çıkmak zor", "Enerjim yok", "Yorgunluk diğer belirtilerimden bağımsız sorun", "Yorgunluk yaşam kalitemi etkiliyor"].map(t => [t, [[1, "Kesinlikle katılmıyorum"], [2, "Katılmıyorum"], [3, "Kararsızım"], [4, "Katılıyorum"], [5, "Kesinlikle katılıyorum"]]])}
+};
+function anketHesap(sid, cev){
+  const a = ANKET[sid], v = a.maddeler.map((m, i) => cev[i]).filter(x => x !== undefined && x !== "" && x !== null).map(Number);
+  if (!v.length) return null;
+  if (a.hesap === "ortalama") return Math.round(v.reduce((t, x) => t + x, 0) / v.length * 10) / 10;
+  if (a.hesap === "odi") return Math.round(v.reduce((t, x) => t + x, 0) / (5 * v.length) * 100);
+  if (a.hesap === "qdash") return v.length < 10 ? null : Math.round(((v.reduce((t, x) => t + x, 0) / v.length) - 1) * 25 * 10) / 10;
+  return v.reduce((t, x) => t + x, 0);
+}
+var ANK_TMP = {};
+function anketFormHTML(sid, cev = {}, mode = "be"){
+  const a = ANKET[sid]; if (!a) return "";
+  return `<div class="ank" data-ank="${sid}" data-mode="${mode}">${a.not ? `<p class="small muted" style="margin:4px 0 8px">${esc(a.not)}</p>` : ""}
+   ${a.maddeler.map(([t, ops], i) => `<label class="ank-m"><span>${esc(t)}</span><select class="ank-i" data-sid="${sid}" data-i="${i}"><option value="">—</option>${ops.map(([v, l]) => `<option value="${v}" ${String(cev[i]) === String(v) ? "selected" : ""}>${v} · ${esc(l)}</option>`).join("")}</select></label>`).join("")}
+   <div class="ank-t">Toplam: <b data-ank-top="${sid}">${anketHesap(sid, cev) ?? "—"}</b> ${esc(S(sid)?.birim || "")} <span class="small muted">(${a.maddeler.length} madde${a.hesap === "odi" ? " · % olarak" : a.hesap === "ortalama" ? " · ortalama" : a.hesap === "qdash" ? " · QuickDASH puanı" : ""})</span></div></div>`;
+}
+document.addEventListener("change", e => {
+  const t = e.target; if (!t.classList?.contains("ank-i")) return;
+  const sid = t.dataset.sid, box = t.closest(".ank"); const cev = {};
+  box.querySelectorAll(".ank-i").forEach(s => { if (s.value !== "") cev[s.dataset.i] = +s.value; });
+  ANK_TMP[sid] = cev; const v = anketHesap(sid, cev);
+  box.querySelector(`[data-ank-top="${sid}"]`).textContent = v ?? "—";
+  const inp = document.querySelector(`[data-be="${sid}"]`) || (box.dataset.mode === "tek" ? document.querySelector("#m-v") : null);
+  if (inp && v != null){ inp.value = v; }
+}, true);
+function anketYazdir(sid){
+  const sc = S(sid), a = ANKET[sid];
+  const html = `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>${esc(sc.ad)} – form</title><style>body{font-family:"IBM Plex Sans",Arial,sans-serif;max-width:800px;margin:24px auto;padding:0 20px;font-size:13px;color:#0d1017}h1{font-size:19px;margin:0 0 4px}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #e1e3ea;padding:7px 6px;vertical-align:top}td:first-child{width:38%;font-weight:600}.o{display:inline-block;margin:2px 10px 2px 0}.o:before{content:"☐ ";}.k{border:1px solid #c9ccd6;padding:10px;margin-top:14px;border-radius:6px}.pb{position:fixed;top:12px;right:12px;padding:8px 14px;border:0;border-radius:6px;background:#5b2fd4;color:#fff;cursor:pointer}@media print{.pb{display:none}}</style></head><body><button class="pb" onclick="window.print()">Yazdır</button>
+   <h1>${esc(sc.ad)}</h1><div style="color:#7a8191">Hasta: ____________________ &nbsp; Tarih: ___/___/______ &nbsp; Değerlendiren: ______________</div>${a.not ? `<p>${esc(a.not)}</p>` : ""}
+   <table>${a.maddeler.map(([t, ops]) => `<tr><td>${esc(t)}</td><td>${ops.map(([v, l]) => `<span class="o">${v} – ${esc(l)}</span>`).join("")}</td></tr>`).join("")}</table>
+   <div class="k">Toplam: ________ ${esc(sc.birim || "")}<br><span style="color:#7a8191">${esc(SCD[sid]?.y || sc.yorum || "")}</span></div><p style="color:#7a8191;font-size:11px">Madde ifadeleri kısaltılmıştır; resmi Türkçe sürüm esas alınmalıdır.</p></body></html>`;
+  downloadFile(`${spssVar(sc.ad)}-form.html`, html);
+}
+Object.assign(EXT_ACT, {"anket-yazdir": t => anketYazdir(t.dataset.id)});
+
+// ===== PROBLEM LİSTESİ → NEDEN → TEDAVİ (vaka sunumu formatı) =====
+// [problem, nedeni (patofizyoloji/klinik akıl yürütme), tedavi yaklaşımı ve nasıl, [egzersizler], [yöntemler]]
+const PROB = {
+ c_inme:[
+  ["Hemiplejik tarafta motor kayıp / sinerji paterni", "Kortikospinal yolun (motor korteks, iç kapsül, bazal ganglion) hasarı; inhibisyon kaybıyla retikülospinal-rubrospinal yollar fleksör (üst), vestibülospinal yol ekstansör (alt) sinerjiyi baskın kılar.", "Bobath/NGT ile proksimal stabilite + selektif hareket; görev odaklı yoğun tekrar; Brunnstrom evresine göre sinerji içinden sinerji dışına; uygun hastada CIMT veya ayna terapisi.", ["e_bil_kol_elev","e_paretik_kol_destek","e_gorev_kol","e_diz_kontrol","e_ayak_dorsi_aktif","e_ayna_terapi"], ["m_bobath","m_gorev","m_cimt","m_ayna","m_brunnstrom"]],
+  ["Duyu kaybı ve hemiplejik tarafın ihmali", "Postsentral girus (Brodmann 3,1,2) ve paryetal korteks etkilenimi; duyusal geri bildirim olmadan motor öğrenme ve vücut şeması bozulur; hemianopsi ihmali artırır.", "Taban altı ve avuç içine derin bası/masaj, farklı dokulu yüzeylerle duyusal girdi, ağırlık aktarımıyla propriosepsiyon; uyaranları ve konuşmayı etkilenen taraftan verme, etkilenen tarafa yan yatış.", ["e_paretik_kol_destek","e_agirlik_aktarma","e_bil_kol_elev"], ["m_duyu","m_bobath","m_pozisyon"]],
+  ["Gövde kontrolü ve oturma dengesi bozukluğu", "Gövde kaslarının bilateral innervasyonuna rağmen etkilenen tarafta aktivasyon gecikmesi ve kısalma; postüral ayarlamalar (APA) bozulur.", "Oturmada ağırlık aktarma, uzanma, latissimus germe; placing ile gövde ekstansiyonu; dönme eğitimi.", ["e_oturma_denge","e_uzanma","e_yatakta_donme"], ["m_bobath","m_noromuskuler"]],
+  ["Spastisite ve kontraktür riski (özellikle gastrosoleus, el bileği-parmak fleksörleri)", "Üst motor nöron lezyonu sonrası refleks disinhibisyonu; uzun süreli kısalmış pozisyonda sarkomer kaybı ve bağ dokusu değişikliği (mekanik bileşen).", "Yavaş ve uzun süreli germe, pozisyonlama, ağırlık aktarma; gerekirse ortez/seri alçı; spastisitede MAS ve Tardieu ile izlem.", ["e_baldir_germe","e_otoinh_kol"], ["m_germe","m_pozisyon","m_ortez"]],
+  ["Omuz subluksasyonu ve hemiplejik omuz ağrısı", "Flask dönemde rotator manşet ve deltoid tonusunun kaybı; kol ağırlığıyla humerus başı aşağı kayar; yanlış transfer ve kol çekme travmatize eder.", "Kolu destekleme (masa, kol desteği), yanlış tutuş ve çekmeden kaçınma; skapula mobilizasyonu; supraspinatus-deltoide NMES; bilateral kol elevasyonu ağrısız aralıkta.", ["e_bil_kol_elev","e_skapula_retraksiyon"], ["m_nmes","m_bant","m_pozisyon"]],
+  ["Yürüme bozukluğu ve düşme riski", "Paretik tarafta yük aktaramama, diz kontrolü kaybı (hiperekstansiyon/bükülme), düşük ayak; denge ve kuvvet azalması.", "Ağırlık aktarma, diz kontrolü, oturup kalkma, sayarak simetrik yürüme, basamak; gerekirse AFO; ilerledikçe hız ve dayanıklılık.", ["e_otur_kalk","e_diz_kontrol","e_sayarak_yurume","e_step_up","e_yuruyus_aerobik"], ["m_gorev","m_bwstt","m_ortez","m_aerobik"]],
+  ["Yutma bozukluğu / aspirasyon riski (varsa)", "Kortikobulber yolların etkilenimi; asimetrik yumuşak damak, gecikmiş yutma refleksi.", "Ekiple yutma değerlendirmesi; beslenme postürü; solunum ve öksürük egzersizleri; dil-yüz egzersizleri.", ["e_dil_rom","e_fonasyon_itme","e_diyafram_nefes"], ["m_solunum","m_egitim"]]],
+ c_parkinson:[
+  ["Bradikinezi ve hipokinezi (küçük amplitüdlü hareket)", "Nigrostriatal dopamin kaybı → bazal ganglion çıkışında artmış inhibisyon; hareket büyüklüğünün iç ölçeklemesi bozulur.", "Büyük amplitüdlü (BIG tarzı) hareket, dış ipuçları (görsel çizgi, metronom), dikkati harekete yöneltme.", ["e_buyuk_amplitud","e_ritmik_yuruyus"], ["m_parkinson","m_gorev"]],
+  ["Rijidite ve postür bozukluğu (fleksiyon postürü)", "Bazal ganglion kaynaklı hız-yön bağımsız tonus artışı; aksiyal rijidite gövde rotasyonunu ve ekstansiyonu kısıtlar.", "Ritmik gövde rotasyonları, torakal ekstansiyon, germe (pektoral, kalça fleksörleri, hamstring), postür farkındalığı.", ["e_torakal_ext","e_pektoral_germe","e_hip_flexor_germe","e_lomber_rot"], ["m_germe","m_parkinson"]],
+  ["Yürüyüşte donma ve dönüş güçlüğü", "Otomatik hareketlerin (bazal ganglion–SMA devresi) bozulması; çift görev ve dar alanlar tetikler.", "Görsel/işitsel ipuçları, dönüşü geniş yay ile yapma, ‘dur–ağırlık aktar–büyük adım’ stratejisi; çift görev eğitimi ON döneminde.", ["e_ritmik_yuruyus","e_agirlik_aktarma","e_yuruyus_engel"], ["m_parkinson"]],
+  ["Postüral instabilite ve düşme", "Postüral refleks ve geriye doğru korunma reaksiyonlarının kaybı; ortostatik hipotansiyon katkı verebilir.", "Statik-dinamik denge, adım stratejisi (pertürbasyon), kuvvet; ev düzenlemesi.", ["e_tandem","e_tek_ayak","e_geri_yan_yurume","e_otur_kalk"], ["m_noromuskuler","m_egitim"]],
+  ["Aerobik kapasite ve kuvvet kaybı", "Hipoaktivite ve dekondisyon.", "Orta-yüksek yoğunlukta aerobik (bisiklet, tempolu yürüyüş), progresif kuvvet; düzenli egzersiz hastalık ilerleyişiyle ilişkili semptomları yavaşlatabilir.", ["e_bisiklet","e_yuruyus_aerobik","e_kopru"], ["m_aerobik","m_pre"]]],
+ c_ms:[
+  ["Yorgunluk", "Merkezi (demiyelinizasyon, iletim verimsizliği) ve periferik nedenler; ısı artışı iletimi bloke eder (Uhthoff).", "Enerji koruma ve aktivite temposu; serin ortamda, aralıklı egzersiz; aerobik kapasite yorgunluğu azaltır.", ["e_bisiklet","e_yuruyus_aerobik"], ["m_enerji","m_aerobik","m_hidro"]],
+  ["Spastisite ve kuvvet kaybı", "Kortikospinal yol plakları.", "Germe, kuvvet (submaksimal), fonksiyonel aktiviteler; spastisitenin postüral destek sağladığı durumları koru.", ["e_hamstring_germe","e_baldir_germe","e_otur_kalk","e_kopru"], ["m_germe","m_pre"]],
+  ["Denge ve koordinasyon bozukluğu (serebellar / duyusal)", "Serebellar ve arka kolon plakları; görsel sorunlar.", "Denge eğitimi (duyusal stratejilere göre), Frenkel, ağırlık manşetleri dikkatli.", ["e_tandem","e_tek_ayak","e_frenkel","e_denge_minder"], ["m_noromuskuler","m_frenkel","m_vestibuler"]],
+  ["Yürüme bozukluğu", "Kuvvet kaybı, spastisite, düşük ayak, yorgunluk.", "Yürüme eğitimi, AFO/FES değerlendirmesi, dayanıklılık.", ["e_ayak_dorsi_aktif","e_yuruyus_engel","e_yuruyus_aerobik"], ["m_gorev","m_ortez","m_nmes"]]],
+ c_oyy:[
+  ["Seviye altında motor ve duyu kaybı", "Omurilik lezyonu; komplet/inkomplet (AIS).", "Korunmuş kasların kuvvetlendirilmesi, kompanzasyon stratejileri; inkomplette yoğun aktivite temelli eğitim.", ["e_omuz_kurek_cekme","e_skapula_duvar_push","e_ust_ekst_endurans"], ["m_pre","m_gorev","m_bwstt"]],
+  ["Bası yarası riski", "Duyu kaybı ve immobilite.", "15–30 dk'da bir basınç rahatlatma (push-up, öne eğilme), uygun minder, cilt kontrolü eğitimi.", ["e_oturma_denge"], ["m_egitim","m_pozisyon"]],
+  ["Solunum fonksiyonu kaybı (servikal–üst torakal)", "İnterkostal ve abdominal kas paralizisi; etkisiz öksürük.", "Diyafram solunumu, IMT, manuel öksürük desteği, göğüs mobilitesi.", ["e_diyafram_nefes","e_acbt","e_insentif"], ["m_solunum","m_imt","m_havayolu"]],
+  ["Spastisite ve otonomik disrefleksi riski", "Refleks arkı disinhibisyonu; T6 üstünde sempatik kontrolsüz yanıt.", "Germe, pozisyonlama; tetikleyicileri (mesane, bağırsak, cilt) arama; ani KB artışında oturt, nedeni gider.", ["e_hamstring_germe"], ["m_germe","m_egitim"]]],
+ c_tbh:[
+  ["Bilişsel ve davranışsal sorunlar (dikkat, bellek, ajitasyon)", "Diffüz aksonal hasar, frontal-temporal kontüzyon.", "Yapılandırılmış, kısa, tek adımlı talimat; sakin ortam; hatasız öğrenme.", ["e_gorev_kol","e_otur_kalk"], ["m_gorev","m_egitim"]],
+  ["Motor kontrol, denge ve koordinasyon bozukluğu", "Kortikal, serebellar ve beyin sapı etkilenimi.", "Görev odaklı eğitim, denge, koordinasyon.", ["e_agirlik_aktarma","e_tandem","e_frenkel"], ["m_bobath","m_noromuskuler"]],
+  ["Spastisite / kontraktür", "ÜMN lezyonu, uzun yatış.", "Germe, pozisyonlama, seri alçı/ortez.", ["e_baldir_germe"], ["m_germe","m_ortez"]]],
+ c_ataksi:[
+  ["Dismetri, intansiyonel tremor, koordinasyon bozukluğu", "Serebellar hata düzeltme ve zamanlama fonksiyonunun kaybı.", "Frenkel, yavaş ve kontrollü tekrar, görsel geri bildirim, proksimal stabilite; ağırlık manşetleri dikkatli.", ["e_frenkel","e_uzanma"], ["m_frenkel","m_noromuskuler"]],
+  ["Denge bozukluğu ve geniş tabanlı yürüme", "Vestibülo-serebellar ve spinoserebellar yolların etkilenimi.", "Statik → dinamik denge, taban daraltma, yön değiştirme, gövde stabilizasyonu.", ["e_tandem","e_tek_ayak","e_bird_dog","e_yuruyus_engel"], ["m_noromuskuler","m_stabilizasyon","m_vibrasyon"]],
+  ["Gövde kontrolü kaybı", "Vermis tutulumu.", "Dört ayak, diz üstü, oturmada gövde stabilizasyonu.", ["e_bird_dog","e_oturma_denge"], ["m_stabilizasyon"]]],
+ c_vestibuler:[
+  ["Baş hareketiyle baş dönmesi / bulanık görme (VOR kaybı)", "Periferik vestibüler hipofonksiyon; gerçek görüntü kayması (retinal slip).", "Bakış stabilizasyonu (VOR ×1 → ×2), giderek artan hız ve farklı arka planlar.", ["e_gaze_stab"], ["m_vestibuler"]],
+  ["Pozisyonel vertigo (BPPV)", "Otokonyaların yarım daire kanalına girmesi.", "Kanala özgü repozisyon manevrası (Epley, BBQ roll); gerekirse Brandt–Daroff.", ["e_brandt_daroff"], ["m_vestibuler"]],
+  ["Denge bozukluğu, düşme korkusu", "Vestibüler girdinin azalması, görsel bağımlılık.", "Duyusal yerine koyma ve denge eğitimi (gözler kapalı, yumuşak zemin), habituasyon.", ["e_tandem","e_denge_minder","e_yuruyus_engel"], ["m_vestibuler","m_noromuskuler"]]],
+ c_noropati:[
+  ["Distal kas güçsüzlüğü ve düşük ayak", "Periferik sinir aksonal/demiyelinizan hasar.", "Submaksimal kuvvet, ayak bileği ortezi, germe.", ["e_ayak_dorsi_aktif","e_topuk_kaldirma","e_baldir_germe"], ["m_pre","m_ortez"]],
+  ["Duyu kaybı ve duyusal ataksi", "Büyük lifli (propriosepsiyon) tutulum; görsel kompanzasyon.", "Denge eğitimi (görsel ve vestibüler stratejiler), ayak bakımı eğitimi.", ["e_tek_ayak","e_tandem","e_denge_minder"], ["m_noromuskuler","m_egitim"]],
+  ["Nöropatik ağrı", "Küçük lif tutulumu.", "TENS, aerobik egzersiz, eğitim.", ["e_yuruyus_aerobik"], ["m_tens","m_aerobik"]]],
+ c_gbs:[
+  ["Akut dönemde yaygın güçsüzlük ve solunum riski", "Akut inflamatuar demiyelinizan poliradikülonöropati.", "Solunum izlemi, pozisyonlama, pasif-aktif yardımlı EHA, yorgunluktan kaçınma.", ["e_diyafram_nefes","e_ayak_pompa"], ["m_solunum","m_pozisyon"]],
+  ["İyileşme döneminde kuvvet ve dayanıklılık kaybı", "Reinnervasyon ve remiyelinizasyon süreci.", "Kademeli, submaksimal kuvvet ve aerobik; aşırı yorgunluk iyileşmeyi geciktirebilir.", ["e_otur_kalk","e_kopru","e_bisiklet"], ["m_pre","m_aerobik","m_enerji"]]],
+ c_als:[
+  ["İlerleyici güçsüzlük", "Üst ve alt motor nöron kaybı.", "Faz I'de hafif-orta yoğunlukta kuvvet ve aerobik; yorgunluk ve kramp sınırı; aşırı eksantrikten kaçın.", ["e_otur_kalk","e_bisiklet"], ["m_pre","m_aerobik","m_enerji"]],
+  ["Solunum kası güçsüzlüğü", "Diyafram ve interkostallerin tutulumu.", "Solunum egzersizleri, öksürük desteği, NIV uyumu.", ["e_diyafram_nefes","e_acbt"], ["m_solunum","m_havayolu"]],
+  ["Kontraktür ve ağrı", "İmmobilite ve spastisite.", "Germe, pozisyonlama, ortez.", ["e_baldir_germe","e_hamstring_germe"], ["m_germe","m_ortez"]]],
+ c_fasiyal:[
+  ["Yüz kaslarında güçsüzlük ve asimetri", "Fasiyal sinir (VII) iletim bloğu/aksonal hasar.", "Ayna karşısında, yavaş ve simetrik mimik egzersizleri; aşırı güçlü kasılma ve elektrik stimülasyonundan kaçınma (sinkinezi riski).", ["e_yuz_mimik"], ["m_egitim"]],
+  ["Göz kapanmama", "Orbikülaris okuli güçsüzlüğü.", "Göz koruma eğitimi (damla, gece bant), göz kapama egzersizi.", ["e_yuz_mimik"], ["m_egitim"]]],
+ c_sp:[
+  ["Spastisite ve kontraktür (gastrosoleus, hamstring, kalça addüktörleri)", "Gelişmekte olan beyinde ÜMN lezyonu; kas büyümesi kemik büyümesine yetişemez.", "Uzun süreli germe, pozisyonlama, ortez, ayakta durma sehpası; gerekirse BoNT sonrası yoğun program.", ["e_ped_germe_gastro","e_hamstring_germe"], ["m_germe","m_ortez","m_pozisyon"]],
+  ["Postüral kontrol ve motor beceri gecikmesi", "Motor kontrol ve kas kuvveti yetersizliği.", "Görev odaklı, oyun içinde motor beceri eğitimi (GMFCS düzeyine uygun), NGT.", ["e_ped_oturma","e_ped_emekleme","e_ped_ayakta_oyun","e_ped_top_uzerinde"], ["m_bobath","m_gorev"]],
+  ["Kas güçsüzlüğü", "Primer bozukluk – spastisite güçsüzlüğü maskeleyebilir.", "Progresif kuvvet eğitimi oyunla (köprü, otur-kalk, basamak).", ["e_kopru","e_otur_kalk","e_step_up"], ["m_pre"]]],
+ c_dmd:[
+  ["İlerleyici proksimal güçsüzlük", "Distrofin eksikliği → kas lifi yıkımı.", "Submaksimal aktif egzersiz, yüzme; eksantrik ve ağır dirençli egzersizden kaçın.", ["e_ped_hayvan_yurumesi","e_bisiklet"], ["m_hidro","m_aerobik"]],
+  ["Kontraktür (Aşil, kalça fleksör, İTB)", "Kas dengesizliği ve fibrozis.", "Günlük germe, gece AFO.", ["e_ped_germe_gastro","e_hip_flexor_germe"], ["m_germe","m_ortez"]],
+  ["Solunum fonksiyonu kaybı", "Solunum kası tutulumu.", "Solunum egzersizleri, öksürük desteği.", ["e_diyafram_nefes","e_insentif"], ["m_solunum","m_havayolu"]]],
+ c_bel:[
+  ["Ağrı ve hareket korkusu", "Mekanik yüklenme, merkezi duyarlılık, korkudan kaçınma inançları.", "Ağrı nörobilimi eğitimi, aktif kalma, kademeli aktivite; McKenzie yön tercihi varsa.", ["e_mckenzie_ext","e_diz_gogus","e_pelvik_tilt"], ["m_egitim","m_mckenzie"]],
+  ["Derin stabilizatör kasların (TrA, multifidus) aktivasyon gecikmesi ve atrofisi", "Ağrıya bağlı motor kontrol değişikliği; multifidus atrofi/yağ infiltrasyonu.", "Motor kontrol egzersizleri: önce izole aktivasyon (US biofeedback), sonra fonksiyonel entegrasyon.", ["e_ta_aktivasyon","e_bird_dog","e_dead_bug","e_kopru"], ["m_stabilizasyon"]],
+  ["Esneklik kaybı", "Hamstring, kalça fleksör kısalığı.", "Germe ve nöral mobilizasyon.", ["e_hamstring_germe","e_hip_flexor_germe","e_piriformis"], ["m_germe"]],
+  ["Fiziksel uygunluk kaybı", "Dekondisyon.", "Aerobik ve genel kuvvet.", ["e_yuruyus_aerobik","e_plank_yan"], ["m_aerobik","m_pre"]]],
+ c_disk:[
+  ["Radiküler ağrı ve nörolojik bulgu", "Disk herniasyonuyla sinir kökü kompresyonu/inflamasyonu.", "Yön tercihi (çoğunlukla ekstansiyon) ile santralizasyon, nöral mobilizasyon, gerekirse traksiyon; ilerleyici nörolojik kayıpta sevk.", ["e_mckenzie_ext","e_siyatik_kaydirma"], ["m_mckenzie","m_noral","m_traksiyon"]],
+  ["Segmental stabilite kaybı", "Multifidus inhibisyonu.", "Stabilizasyon egzersizleri.", ["e_ta_aktivasyon","e_bird_dog","e_kopru"], ["m_stabilizasyon"]]],
+ c_boyun:[
+  ["Boyun ağrısı ve hareket kısıtlılığı", "Mekanik, postüral yüklenme; faset/yumuşak doku.", "Manuel terapi + egzersiz, ağrısız EHA.", ["e_boyun_rot","e_boyun_germe_lat"], ["m_maitland","m_mulligan"]],
+  ["Derin boyun fleksörlerinin zayıflığı", "Ağrıya bağlı motor kontrol değişikliği.", "Kraniyoservikal fleksiyon eğitimi (biofeedback ile), skapular kas kuvveti.", ["e_cene_ice","e_skapula_retraksiyon","e_omuz_kurek_cekme"], ["m_stabilizasyon"]],
+  ["İleri baş postürü", "Uzun süreli bilgisayar/telefon kullanımı.", "Postür eğitimi, torakal ekstansiyon, pektoral germe, ergonomi.", ["e_postur_duvar","e_torakal_ext","e_pektoral_germe"], ["m_egitim","m_germe"]]],
+ c_diz_oa:[
+  ["Ağrı ve tutukluk", "Kıkırdak dejenerasyonu, subkondral kemik ve sinovyal inflamasyon.", "Eğitim ve kilo yönetimi, egzersiz (birinci basamak), TENS/sıcak.", ["e_bisiklet","e_topuk_kaydirma"], ["m_egitim","m_tens","m_sicak"]],
+  ["Quadriceps güçsüzlüğü ve inhibisyonu", "Artrojenik kas inhibisyonu.", "Quadriceps ve kalça kuvvetlendirme (açık ve kapalı zincir).", ["e_quad_set","e_dbk","e_diz_ext_otur","e_mini_squat","e_yan_yatis_abd"], ["m_pre","m_nmes"]],
+  ["Denge ve fonksiyon kaybı", "Propriosepsiyon azalması.", "Denge ve fonksiyonel eğitim, aerobik.", ["e_tek_ayak","e_step_up","e_yuruyus_aerobik"], ["m_noromuskuler","m_aerobik","m_hidro"]]],
+ c_tka:[
+  ["Ağrı ve ödem", "Cerrahi travma.", "Kriyoterapi, elevasyon, ayak bileği pompası.", ["e_ayak_pompa"], ["m_soguk"]],
+  ["Diz EHA kısıtlılığı (ekstansiyon kaybı en kritik)", "Ağrı, ödem, artrofibrozis riski.", "Erken EHA, topuk kaydırma, ekstansiyonda pozisyonlama (diz altına yastık yok).", ["e_topuk_kaydirma","e_quad_set"], ["m_maitland"]],
+  ["Quadriceps aktivasyon kaybı", "Artrojenik inhibisyon.", "Quadriceps set, DBK, NMES, kademeli kapalı zincir.", ["e_quad_set","e_dbk","e_otur_kalk","e_step_up"], ["m_nmes","m_pre"]],
+  ["Yürüme ve denge", "Ağrı, kuvvet kaybı.", "Yardımcı cihazla yürüme eğitimi → yardımcısız, denge.", ["e_tek_ayak","e_yuruyus_aerobik"], ["m_gorev"]]],
+ c_ocb:[
+  ["Efüzyon, ağrı ve ekstansiyon kaybı", "Cerrahi/travma sonrası inflamasyon; quadriceps inhibisyonu.", "Kriyoterapi, erken tam ekstansiyon, patellar mobilizasyon.", ["e_quad_set","e_topuk_kaydirma"], ["m_soguk"]],
+  ["Quadriceps ve hamstring kuvvet kaybı", "İnhibisyon ve atrofi; greft iyileşmesi.", "Kriter temelli progresif kuvvet (kapalı → açık zincir sınırlı aralıkta), NMES.", ["e_mini_squat","e_step_up","e_kopru","e_terminal_diz"], ["m_pre","m_nmes"]],
+  ["Nöromüsküler kontrol ve propriosepsiyon kaybı", "Mekanoreseptör kaybı; dinamik valgus.", "Denge, pliometrik, çeviklik; iniş mekaniği eğitimi.", ["e_tek_ayak","e_denge_minder"], ["m_noromuskuler"]]],
+ c_omuz_sikisma:[
+  ["Ağrı ve ağrılı ark", "Subakromiyal aralıkta rotator manşet ve bursanın sıkışması; tendinopati.", "Aktivite modifikasyonu, ağrısız aralıkta egzersiz, manuel terapi.", ["e_omuz_pendulum","e_omuz_cubuk_fleksiyon"], ["m_maitland","m_mulligan"]],
+  ["Rotator manşet güçsüzlüğü", "Humerus başını depresse eden kuvvet çiftinin bozulması.", "DR/İR kuvvetlendirme (bant), skapular düzlemde elevasyon.", ["e_omuz_dr_band","e_omuz_ir_band","e_omuz_abd_scap"], ["m_pre"]],
+  ["Skapular diskinezi", "Serratus anterior ve alt trapez zayıflığı, pektoralis minör kısalığı.", "Skapular stabilizasyon, posterior kapsül ve pektoral germe.", ["e_skapula_duvar_push","e_omuz_kurek_cekme","e_omuz_kapsul_post","e_pektoral_germe"], ["m_stabilizasyon","m_germe"]]],
+ c_donuk_omuz:[
+  ["Kapsüler kısıtlılık (DR > ABD > İR)", "Glenohumeral kapsülde inflamasyon ve fibrozis.", "Evreye uygun germe: donma döneminde ağrısız, düşük yoğunluk; çözülme döneminde daha yoğun mobilizasyon.", ["e_omuz_pendulum","e_omuz_cubuk_dr","e_omuz_duvar_tirmanma","e_omuz_kapsul_post"], ["m_maitland","m_germe"]],
+  ["Ağrı", "Sinovit.", "Sıcak, TENS, ağrısız egzersiz; enjeksiyon sonrası egzersiz.", ["e_omuz_pendulum"], ["m_sicak","m_tens"]]],
+ c_koah:[
+  ["Dispne ve egzersiz intoleransı", "Hava akımı kısıtlılığı, dinamik hiperinflasyon, periferik kas disfonksiyonu.", "Pulmoner rehabilitasyon: aralıklı → sürekli aerobik, dudak büzme ile tempo.", ["e_dudak_buzme","e_yuruyus_aerobik","e_bisiklet","e_aralikli_yuruyus"], ["m_aerobik","m_solunum"]],
+  ["Periferik kas güçsüzlüğü", "Sistemik inflamasyon, inaktivite.", "Alt ve üst ekstremite kuvvet eğitimi.", ["e_otur_kalk","e_ust_ekst_endurans"], ["m_pre"]],
+  ["Sekresyon retansiyonu", "Mukosiliyer klirens bozukluğu.", "ACBT, huffing, postüral drenaj.", ["e_acbt"], ["m_havayolu"]],
+  ["İnspiratuar kas zayıflığı", "Hiperinflasyonla diyafram mekanik dezavantajı.", "IMT (MIP < 60 cmH₂O ise).", ["e_diyafram_nefes"], ["m_imt"]]],
+ c_kalp:[
+  ["Düşük fonksiyonel kapasite", "Kardiyak debi kısıtlılığı, dekondisyon.", "Kardiyak rehabilitasyon: KH rezervi/Borg ile aerobik, kademeli artış.", ["e_yuruyus_aerobik","e_bisiklet"], ["m_aerobik"]],
+  ["Risk faktörleri", "HT, diyabet, lipid, sigara, inaktivite.", "Eğitim, düzenli egzersiz alışkanlığı, kuvvet eğitimi.", ["e_otur_kalk","e_ust_ekst_endurans"], ["m_egitim","m_pre"]]],
+ c_dusme:[
+  ["Kuvvet kaybı (özellikle alt ekstremite)", "Sarkopeni, inaktivite.", "Otago kuvvet egzersizleri, otur-kalk.", ["e_otur_kalk","e_topuk_kaldirma","e_yan_yatis_abd","e_diz_ext_otur"], ["m_otago","m_pre"]],
+  ["Denge bozukluğu", "Duyusal, vestibüler ve motor sistemlerde yaşa bağlı azalma.", "Progresif denge eğitimi (haftada ~2 saat).", ["e_tandem","e_tek_ayak","e_geri_yan_yurume","e_yuruyus_engel"], ["m_otago","m_noromuskuler"]],
+  ["Düşme korkusu ve ev ortamı riskleri", "Önceki düşme, düşük öz-yeterlik.", "Eğitim, ev düzenlemesi, yerden kalkma eğitimi.", ["e_otur_kalk"], ["m_egitim"]]],
+ c_fibromiyalji:[
+  ["Yaygın ağrı ve merkezi duyarlılık", "Ağrı modülasyonunda bozulma.", "Ağrı nörobilimi eğitimi, düşük başlayıp kademeli artan aerobik (en güçlü kanıt).", ["e_yuruyus_aerobik","e_bisiklet"], ["m_egitim","m_aerobik","m_hidro"]],
+  ["Yorgunluk ve uyku bozukluğu", "Merkezi mekanizmalar, dekondisyon.", "Aktivite temposu, düzenli egzersiz, gevşeme.", ["e_diyafram_nefes"], ["m_enerji"]],
+  ["Kuvvet ve esneklik kaybı", "İnaktivite.", "Düşük-orta yoğunlukta kuvvet ve germe.", ["e_kopru","e_hamstring_germe"], ["m_pre","m_germe"]]],
+ c_ra:[
+  ["Eklem ağrısı ve inflamasyon", "Sinovit.", "Aktif dönemde koruma, ortez, soğuk; inaktif dönemde aktif egzersiz.", ["e_tendon_kaydirma","e_el_kavrama"], ["m_ortez","m_soguk"]],
+  ["Eklem hareket kaybı ve deformite riski", "Kapsül ve tendon tutulumu.", "Günlük EHA, eklem koruma eğitimi.", ["e_tendon_kaydirma","e_dirsek_rom","e_omuz_cubuk_fleksiyon"], ["m_egitim"]],
+  ["Kuvvet ve aerobik kapasite kaybı", "İnaktivite, kaşeksi.", "Orta yoğunlukta aerobik ve kuvvet.", ["e_bisiklet","e_otur_kalk"], ["m_aerobik","m_pre","m_hidro"]]],
+ c_as:[
+  ["Omurga mobilitesi kaybı ve kifoz", "Entezit, sindesmofit, ankiloz.", "Günlük spinal mobilite ve ekstansiyon egzersizleri, postür.", ["e_mckenzie_ext","e_kedi_deve","e_torakal_ext","e_postur_duvar"], ["m_germe"]],
+  ["Göğüs ekspansiyonu azalması", "Kostovertebral eklem tutulumu.", "Derin solunum ve göğüs mobilizasyonu.", ["e_segmental_nefes","e_diyafram_nefes"], ["m_solunum"]],
+  ["Aerobik kapasite kaybı", "İnaktivite, ağrı.", "Aerobik egzersiz, yüzme.", ["e_yuruyus_aerobik"], ["m_aerobik","m_hidro"]]],
+ c_skolyoz:[
+  ["Üç boyutlu omurga deformitesi", "Adolesan idiopatik skolyoz; büyüme dönemi progresyon riski.", "Skolyoza özgü egzersiz (Schroth, SEAS): aktif kendini düzeltme, rotasyonel solunum, düzeltilmiş postürün günlük yaşama aktarılması.", ["e_schroth_nefes","e_postur_duvar"], ["m_schroth"]],
+  ["Gövde kas dengesizliği", "Konkav-konveks taraf asimetrisi.", "Stabilizasyon ve dayanıklılık.", ["e_bird_dog","e_plank_yan"], ["m_stabilizasyon"]]],
+ c_lat_epi:[
+  ["Ekstansör tendinopati ve kavrama ağrısı", "ECRB'de tekrarlayan yüklenme, dejeneratif tendinopati.", "Eksantrik / izometrik yükleme, aktivite modifikasyonu, bant/ortez.", ["e_bilek_eksantrik","e_bilek_ekst_germe"], ["m_pre","m_ortez","m_bant"]],
+  ["Ağrı", "Lokal nosisepsiyon.", "Transvers friksiyon, ESWT, manuel terapi (Mulligan MWM).", ["e_el_kavrama"], ["m_tfm","m_eswt","m_mulligan"]]],
+ c_ktb:[
+  ["Median sinir kompresyonu (gece uyuşma)", "Karpal tünel basıncı artışı.", "Nötral gece splinti, aktivite modifikasyonu.", ["e_sinir_kaydirma_median"], ["m_ortez","m_egitim"]],
+  ["Sinir ve tendon kaymasında azalma", "Ödem, fibrozis.", "Median sinir ve tendon kaydırma egzersizleri.", ["e_sinir_kaydirma_median","e_tendon_kaydirma"], ["m_noral"]]],
+ c_ayak_bilegi:[
+  ["Ağrı, ödem", "Bağ yaralanması.", "Koruma, kompresyon, elevasyon, erken yük.", ["e_ayak_pompa","e_alfabe_ayak"], ["m_soguk"]],
+  ["Propriosepsiyon kaybı ve tekrarlayan burkulma riski", "Mekanoreseptör hasarı, peroneal reaksiyon gecikmesi.", "Denge ve propriosepsiyon eğitimi (en az 6–12 hafta), peroneal kuvvet.", ["e_tek_ayak","e_denge_minder","e_topuk_kaldirma"], ["m_noromuskuler","m_bant"]]],
+ c_pfa:[
+  ["Ön diz ağrısı (çömelme, merdiven)", "Patellofemoral eklem yüklenmesi, kalça-diz kontrol bozukluğu.", "Kalça (abdüktör, dış rotatör) ve quadriceps kuvveti; yük yönetimi.", ["e_clamshell","e_yan_yatis_abd","e_mini_squat","e_step_up"], ["m_pre","m_bant"]],
+  ["Dinamik diz valgusu", "Kalça kontrol kaybı.", "Nöromüsküler kontrol eğitimi, ayna geri bildirimi.", ["e_tek_ayak","e_yan_adim_bant"], ["m_noromuskuler"]]],
+ c_osteoporoz:[
+  ["Kırık riski ve düşme", "Düşük kemik yoğunluğu, denge kaybı.", "Yük taşıyan ve dirençli egzersiz, denge eğitimi; fleksiyon + rotasyon kombinasyonundan kaçınma.", ["e_topuk_kaldirma","e_otur_kalk","e_tandem","e_tek_ayak"], ["m_pre","m_otago"]],
+  ["Torakal kifoz", "Vertebral kompresyon kırıkları, ekstansör zayıflığı.", "Sırt ekstansör kuvveti, postür.", ["e_torakal_ext","e_postur_duvar","e_skapula_retraksiyon"], ["m_egitim"]]],
+ c_distoni:[
+  ["İstemsiz kasılmalar ve anormal postür", "Bazal ganglion–serebellum ağında inhibisyon kaybı, sensörimotor entegrasyon bozukluğu.", "Sensörimotor yeniden eğitim, görev odaklı pratik, EMG biofeedback; BoNT sonrası 48–72 saatte egzersiz.", ["e_ayna_terapi","e_gorev_kol","e_cene_ice"], ["m_gorev","m_ayna","m_duyu"]],
+  ["Ağrı ve sekonder kas-iskelet sorunları", "Sürekli kasılma.", "Germe, gevşeme, postür.", ["e_boyun_germe_lat","e_postur_duvar"], ["m_germe","m_myofasyal"]]],
+ c_sui:[
+  ["Efor sırasında idrar kaçırma", "Pelvik taban kas zayıflığı ve zamanlama bozukluğu, üretral destek kaybı.", "Pelvik taban kas eğitimi (≥ 12 hafta), knack.", ["e_kegel","e_knack"], ["m_egitim"]],
+  ["Karın içi basınç yönetimi bozukluğu", "Diyafram–TrA–pelvik taban eşgüdümü kaybı.", "Solunum ve gövde stabilizasyonu.", ["e_diyafram_nefes","e_ta_aktivasyon"], ["m_stabilizasyon"]]],
+ c_disfaji:[
+  ["Larengeal elevasyon yetersizliği", "Suprahyoid kas zayıflığı, boyun fibrozisi (radyoterapi).", "Shaker/CTAR, larengeal mobilizasyon.", ["e_shaker","e_ctar"], ["m_myofasyal"]],
+  ["Gecikmiş yutma refleksi", "Duyusal eşik artışı, nörolojik etkilenim.", "Termal-taktil stimülasyon (yemeksiz), ekiple kıvam ayarı.", ["e_dil_rom"], ["m_duyu"]],
+  ["Ağız açıklığında azalma", "TME ve çiğneme kaslarında fibrozis.", "Çene açıklığı egzersizleri, TME mobilizasyonu.", ["e_cene_aciklik"], ["m_germe"]],
+  ["Postür bozukluğu (ileri baş, kifoz)", "Yutma kaslarının çekiş açısını bozar.", "Postür egzersizleri, beslenme postürü.", ["e_postur_duvar","e_cene_ice","e_pektoral_germe"], ["m_egitim"]]]
+};
+// Problem listesi yoksa ICF alanından türet
+function probList(c){
+  if (PROB[c.id]) return PROB[c.id];
+  const bf = (ICF_ALAN[c.alan] || {}).bf || [];
+  return bf.slice(0, 4).map((b, i) => [b.replace(/\s*\(.*?\)\s*/g, ""), "Bu protokoldeki genel bozukluk alanı (ICF vücut fonksiyonu).", c.hedefKisa[i] || c.hedefKisa[0] || "", c.egz.slice(i * 2, i * 2 + 2), c.yontem.slice(i, i + 1)]);
+}
+function probHTML(c){
+  const L = probList(c);
+  return `<table class="prob"><thead><tr><th style="width:24%">Problem</th><th style="width:30%">Nedeni</th><th>Tedavi yaklaşımı</th></tr></thead><tbody>${L.map(([p, n, y, eids, mids], i) => `<tr><td><b>${i + 1}. ${esc(p)}</b></td><td class="small">${esc(n)}</td><td class="small">${esc(y)}<div class="chips" style="margin-top:6px">${(eids || []).filter(E).map(id => `<button class="chip sm" data-act="open-ex" data-id="${id}">${esc(E(id).ad)}</button>`).join("")}${(mids || []).filter(M).map(id => `<button class="chip sm ghost" data-act="open-method" data-id="${id}">${esc(M(id).ad)}</button>`).join("")}</div></td></tr>`).join("")}</tbody></table>
+   ${PROB[c.id] ? "" : `<p class="small muted" style="margin:4px 0 0">Bu protokol için genel problem alanları gösteriliyor; hastaya göre özelleştir.</p>`}`;
+}
+function ornekSeansHTML(c){
+  const t = SEANS_SABLON[c.alan]; if (!t) return "";
+  const {fazlar} = progFazlar(c), f = fazlar[1] || fazlar[0];
+  const ex = [...f.yeni, ...f.devam].slice(0, 6);
+  return `<p class="small muted" style="margin:0 0 6px">Faz 2 için örnek; ${esc(t.sure)}.</p>${t.bloklar.map((b, i) => `<div class="phase"><b>${i + 1}. ${esc(b[0])} <span class="muted small">~${b[1]} dk</span></b><span class="small">${esc(b[2])}${i === 2 || (t.bloklar.length < 4 && i === 1) ? `<br><b>Bu protokolde:</b> ${ex.map(id => esc(E(id).ad) + " (" + esc(dozStr(dozFaz(E(id), 1))) + ")").join("; ")}` : ""}</span></div>`).join("")}`;
+}
+
+// ===== HASTA İÇİN VAKA SUNUMU (sınav / sunum formatı) =====
+RAPOR_TUR.vaka = ["Vaka sunumu", "Hasta tanıtımı, değerlendirme, problemler ve nedenleri, hedefler, tedavi, seans seans gidişat, ICF – sınav/sunum formatı."];
+const _raporHTML = raporHTML, _raporOneri = raporOneri;
+raporOneri = function(p, tur){
+  if (tur !== "vaka") return _raporOneri(p, tur);
+  return "Değerlendirme sonuçlarının yorumu: …\nTedavinin sonuçları ve klinik akıl yürütme: …\nBu vakadan öğrenilenler: …";
+};
+raporHTML = function(p, o){ return o.tur === "vaka" ? vakaSunumHTML(p, o) : _raporHTML(p, o); };
+function vakaSunumHTML(p, o){
+  const inR = d => (!o.bas || d >= o.bas) && (!o.bit || d <= o.bit);
+  const ad = o.anon ? initials(p.ad) : p.ad, conds = (p.condIds || []).map(C).filter(Boolean), g = p.program || {};
+  const ses = (p.seanslar || []).filter(s => inR(s.tarih));
+  const olc = {}; (p.olcumler || []).filter(x => inR(x.tarih) && x.not !== "seans öncesi").forEach(x => { const k = x.sid + (S(x.sid)?.alt ? "|" + (x.not || "").trim().toLocaleLowerCase("tr") : ""); (olc[k] = olc[k] || []).push(x); });
+  Object.values(olc).forEach(a => a.sort((x, y) => x.tarih.localeCompare(y.tarih)));
+  const sec = (n, t, h) => h ? `<h2><span>${n}</span>${t}</h2>${h}` : "";
+  const li = a => a.length ? `<ul>${a.map(x => `<li>${x}</li>`).join("")}</ul>` : "";
+  let n = 0; const N = () => ++n;
+  // 1 Hasta tanıtımı
+  let h = sec(N(), "Hasta tanıtımı ve öykü", `<table class="info"><tr><td>Hasta</td><td><b>${esc(ad)}</b>${age(p) ? `, ${age(p)} yaş` : ""}${p.cins ? `, ${esc(p.cins)}` : ""}</td></tr><tr><td>Tıbbi tanı</td><td>${esc(p.tani || "—")}</td></tr><tr><td>Fizyoterapi protokolü</td><td>${conds.map(c => esc(c.ad)).join(", ") || "—"}</td></tr>${p.sevk ? `<tr><td>Yönlendiren</td><td>${esc(p.sevk)}</td></tr>` : ""}${p.uyari ? `<tr><td>Eşlik eden durumlar / uyarılar</td><td>${esc(p.uyari)}</td></tr>` : ""}</table>${p.oyku ? `<p style="white-space:pre-wrap">${esc(p.oyku)}</p>` : `<p class="m">Öykü alanı boş – hasta bilgilerinden “Öykü” ekleyin (başvuru nedeni, seyir, ilaçlar, sosyal durum).</p>`}${conds[0] ? `<p class="m"><b>Hastalığın tanımı:</b> ${esc(conds[0].ozet)}</p>` : ""}`);
+  // 2 Değerlendirme
+  const olcTab = Object.values(olc).length ? `<table><thead><tr><th>Ölçek / test</th><th>Başlangıç</th><th>Yorum</th></tr></thead><tbody>${Object.values(olc).map(a => { const sc = S(a[0].sid); if (!sc) return ""; return `<tr><td>${esc(sc.ad)}${sc.alt && a[0].not ? ` <span class="m">(${esc(a[0].not)})</span>` : ""}</td><td><b>${esc(scaleLabel(sc, a[0].deger))}</b> <span class="m">${fmtDate(a[0].tarih)}</span>${a[0].maddeler ? `<div class="m">${(ANKET[sc.id]?.maddeler || []).map((m, i) => a[0].maddeler[i] != null ? `${esc(m[0].replace(/^\d+\.\s*/, ""))}: ${a[0].maddeler[i]}` : "").filter(Boolean).join(" · ")}</div>` : ""}</td><td class="m">${esc((SCD[sc.id]?.y || sc.yorum || "").slice(0, 140))}</td></tr>`; }).join("")}</tbody></table>` : "";
+  const mu = (p.muayeneler || []).filter(m => inR(m.tarih)); const muH = mu.length ? (() => { const oz = muOzet(mu[0]); return `<p><b>Nörolojik muayene (${fmtDate(mu[0].tarih)}):</b> ${esc(oz.asia || "")}</p>${li(oz.satirlar.map(esc))}${mu[0].not ? `<p>${esc(mu[0].not)}</p>` : ""}`; })() : "";
+  const degN = (p.degNotlari || []).filter(x => inR(x.tarih));
+  h += sec(N(), "Değerlendirme sonuçları", `${olcTab}${muH}${degN.length ? `<p><b>Değerlendirme notları:</b></p>${li(degN.map(x => `<span class="m">${fmtDate(x.tarih)}</span> ${esc(x.metin)}`))}` : ""}`);
+  // 3 Problemler
+  const userBf = [...(g.icfProb?.bf || []), ...(g.icfProb?.akt || [])];
+  const pr = conds.flatMap(c => typeof probList === "function" ? probList(c) : []);
+  h += sec(N(), "Problem listesi ve nedenleri", `${userBf.length ? `<p><b>Bu hastada belirlenen problemler:</b></p><ol>${userBf.map(x => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}${pr.length ? `<table><thead><tr><th style="width:30%">Problem</th><th>Nedeni (klinik akıl yürütme)</th></tr></thead><tbody>${pr.map(x => `<tr><td><b>${esc(x[0])}</b></td><td>${esc(x[1])}</td></tr>`).join("")}</tbody></table><p class="m">Tablo protokolün tipik problemlerini içerir; hastada bulunmayanları sunumdan çıkarın.</p>` : ""}`);
+  // 4 Hedefler
+  const hed = g.hedefler || [];
+  h += sec(N(), "Hedefler", hed.length ? `<div class="g2"><div><b>Kısa dönem</b>${li(hed.filter(x => x.vade !== "uzun").map(x => esc(x.metin) + (x.olcek && x.hedef !== "" && x.hedef != null ? ` <span class="m">(${esc(S(x.olcek)?.ad || "")} hedef: ${esc(x.hedef)})</span>` : "")))}</div><div><b>Uzun dönem</b>${li(hed.filter(x => x.vade === "uzun").map(x => esc(x.metin)))}</div></div>` : `<div class="g2"><div><b>Kısa dönem</b>${li((conds[0]?.hedefKisa || []).map(esc))}</div><div><b>Uzun dönem</b>${li((conds[0]?.hedefUzun || []).map(esc))}</div></div>`);
+  // 5 Tedavi programı
+  const kl = (g.klinik || []).map(k => `<li><b>${esc(k.ad || M(k.mid)?.ad || "")}</b>${k.sure ? ` – ${k.sure} dk` : ""}${k.doz ? ` – ${esc(k.doz)}` : ""}${k.not ? ` <span class="m">(${esc(k.not)})</span>` : ""}${M(k.mid)?.ozet ? `<div class="m">${esc(M(k.mid).ozet.slice(0, 220))}</div>` : ""}</li>`);
+  const ev = (g.ev || []).map(x => { const e = E(x.eid); if (!e) return ""; return `<li><b>${esc(e.ad)}</b> – ${esc([x.set && x.set + " set", x.tekrar && x.tekrar + " tekrar", x.tut, x.siklik].filter(Boolean).join(", "))}<div class="m">${esc(e.adim.join(" "))}</div></li>`; }).filter(Boolean);
+  const probTedavi = pr.length ? `<p><b>Probleme göre tedavi:</b></p><ol>${pr.map(x => `<li><b>${esc(x[0])}:</b> ${esc(x[2])}</li>`).join("")}</ol>` : "";
+  h += sec(N(), "Tedavi programı ve yapılış şekli", `${probTedavi}${kl.length ? `<p><b>Klinik uygulamalar${g.sikl ? ` (${esc(g.sikl)}${g.sure ? ", " + esc(g.sure) : ""})` : ""}:</b></p><ul>${kl.join("")}</ul>` : ""}${ev.length ? `<p><b>Ev programı${g.faz != null ? ` (Faz ${g.faz + 1})` : ""}:</b></p><ul>${ev.join("")}</ul>` : ""}`);
+  // 6 Seans seans gidişat
+  if (ses.length) h += sec(N(), "Seans seans tedavi gidişatı", `<table><thead><tr><th>Seans</th><th>Durum / vital</th><th>Uygulananlar</th><th>Değerlendirme ve plan</th></tr></thead><tbody>${ses.map(s => { const v = o => [o?.vas !== undefined && o?.vas !== "" ? "VAS " + o.vas : "", o?.kb ? "KB " + o.kb : "", o?.kh ? "KH " + o.kh : "", o?.spo2 ? "SpO₂ %" + o.spo2 : ""].filter(Boolean).join(", ");
+      return `<tr><td><b>${s.no || ""}</b><div class="m">${fmtDate(s.tarih)}${s.sureDk ? " · " + s.sureDk + " dk" : ""}</div></td><td class="m">${esc(v(s.oncesi))}${v(s.sonrasi) ? "<br>Sonrası: " + esc(v(s.sonrasi)) : ""}${s.uyum != null && s.uyum !== "" ? "<br>Ev uyumu %" + s.uyum : ""}${s.soap?.s ? "<br>" + esc(s.soap.s) : ""}</td><td>${esc((s.uygulanan || []).filter(u => u.yapildi).map(u => u.ad).join(", ") || "—")}</td><td class="m">${esc([s.soap?.o, s.soap?.a, s.soap?.p].filter(Boolean).join(" | "))}</td></tr>`; }).join("")}</tbody></table>`);
+  // 7 Sonuçlar
+  const son = Object.values(olc).filter(a => a.length > 1 && S(a[0].sid));
+  if (son.length) h += sec(N(), "Tedavi sonuçları", `<table><thead><tr><th>Ölçek</th><th>İlk</th><th>Son</th><th>Değişim</th><th>Yorum</th></tr></thead><tbody>${son.map(a => { const sc = S(a[0].sid), d = +a.at(-1).deger - +a[0].deger, an = SC_ANLAM[sc.id]; const y = !sc.yon ? "—" : an ? (d * sc.yon >= an[0] ? "Klinik olarak anlamlı iyileşme" : d * sc.yon <= -an[0] ? "Anlamlı kötüleşme" : "Ölçüm hatası sınırında") : (d * sc.yon > 0 ? "İyileşme" : d === 0 ? "Değişim yok" : "Kötüleşme"); return `<tr><td>${esc(sc.ad)}</td><td>${esc(scaleLabel(sc, a[0].deger))}</td><td>${esc(scaleLabel(sc, a.at(-1).deger))}</td><td>${d > 0 ? "+" : ""}${Math.round(d * 100) / 100}</td><td>${y}</td></tr>`; }).join("")}</tbody></table><div class="gr">${son.map(a => `<div class="gi"><div class="gt">${esc(S(a[0].sid).ad)}</div>${grafikSVG(a, S(a[0].sid), {w:320, h:140, hedef:hedefDeger(p, a[0].sid)})}</div>`).join("")}</div>${mu.length > 1 ? (() => { const A = asiaHesap(mu[0]), B = asiaHesap(mu.at(-1)); return `<p class="m">Nörolojik muayene (${fmtDate(mu[0].tarih)} → ${fmtDate(mu.at(-1).tarih)}): UEMS ${A.uems}→${B.uems}, LEMS ${A.lems}→${B.lems}, hafif dokunma ${A.dok}→${B.dok}, iğne batma ${A.ign}→${B.ign}.</p>`; })() : ""}`);
+  // 8 ICF
+  const icf = g.icfProb || {};
+  h += sec(N(), "ICF", `<table class="info"><tr><td>Sağlık durumu</td><td>${esc(p.tani || conds.map(c => c.ad).join(", "))}</td></tr>${Object.entries(ICF_SEVIYE).map(([k, v]) => `<tr><td>${v}</td><td>${(icf[k] || []).length ? (icf[k] || []).map(esc).join("; ") : `<span class="m">${(ICF_ALAN[conds[0]?.alan]?.[k] || []).map(esc).join("; ")}</span>`}</td></tr>`).join("")}</table>`);
+  if (o.yorum) h += sec(N(), "Yorum ve öğrenilenler", `<p style="white-space:pre-wrap">${esc(o.yorum)}</p>`);
+  return `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vaka sunumu – ${esc(ad)}</title><style>
+   body{font-family:"IBM Plex Sans",-apple-system,"Segoe UI",Arial,sans-serif;max-width:860px;margin:24px auto;padding:0 22px;color:#0d1017;font-size:13.5px;line-height:1.55}
+   .hd{border-bottom:3px solid #0b0d13;padding-bottom:12px;margin-bottom:8px}.hd h1{margin:4px 0 0;font-size:24px}.k{color:#5b2fd4;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+   h2{display:flex;align-items:center;gap:10px;font-size:15px;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid #dde0e8}h2 span{background:#5b2fd4;color:#fff;width:24px;height:24px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+   table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #e6e8ee;vertical-align:top}th{background:#f3f4f7;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#3b4250}
+   table.info td:first-child{width:190px;color:#7a8191}.m{color:#7a8191;font-size:12px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.gi{border:1px solid #e6e8ee;border-radius:8px;padding:8px 10px;break-inside:avoid}.gt{font-weight:600;font-size:12px}
+   ul,ol{padding-left:20px}li{margin:4px 0}.pb{position:fixed;top:12px;right:12px;padding:8px 14px;border-radius:6px;border:0;background:#5b2fd4;color:#fff;cursor:pointer}@media print{.pb{display:none}body{margin:0}h2{break-after:avoid}}
+  </style></head><body><button class="pb" onclick="window.print()">Yazdır / PDF</button>
+  <div class="hd"><div class="k">${esc(DB.ayar.klinik || "Fizyoterapi ve Rehabilitasyon")} · Vaka sunumu</div><h1>${esc(conds[0]?.ad || p.tani || "Vaka")}</h1><div class="m">${esc(ad)} · ${fmtDate(o.bas)} – ${fmtDate(o.bit)} · ${ses.length} seans · Hazırlayan: ${esc(DB.ayar.terapist || "")}</div></div>
+  ${h}</body></html>`;
+}
+
 // ================= FİZYO SEANS – UYGULAMA =================
 const KEY = "fizyoSeans.v1";
 const $ = s => document.querySelector(s);
@@ -4549,12 +4901,13 @@ function evalCard(p, compact = false){
   return compact ? "" : `<div class="note info row" style="margin-bottom:14px"><span class="sp">Sonraki ara değerlendirme: <b>${fmtDate(s.next)}</b> (${s.kalan} gün sonra) · son değerlendirme ${fmtDate(s.son)}</span><button class="btn sm" data-act="batch-eval" data-hid="${p.id}">Şimdi yap</button><button class="btn sm ghost" data-act="open-rehber" data-id="r_deg">Ne zaman anlamlı?</button></div>`;
 }
 function batchEval(p){
+  ANK_TMP = {};
   const rec = [...new Set((p.condIds || []).flatMap(id => C(id)?.olcek || []))];
   const list = rec.length ? rec : ["s_vas","s_eha","s_mmt"];
   const last = sid => (p.olcumler || []).filter(o => o.sid === sid).sort((a, b) => a.tarih.localeCompare(b.tarih)).at(-1);
   const rows = list.map(sid => { const sc = S(sid); if (!sc) return ""; const l = last(sid);
     const inp = sc.sec ? `<select data-be="${sid}"><option value="">—</option>${sc.sec.map(o => `<option value="${o[0]}">${esc(o[1])}</option>`).join("")}</select>` : `<input type="number" data-be="${sid}" min="${sc.min}" max="${sc.max}" step="${sc.adim}" placeholder="${sc.min}–${sc.max}">`;
-    return `<tr><td><b>${esc(sc.ad)}</b>${SCD[sid]?.u ? `<details class="small" style="margin-top:4px"><summary style="cursor:pointer;color:var(--teal)">Nasıl uygulanır?</summary><ol style="padding-left:18px;margin:4px 0">${SCD[sid].u.map(i => `<li>${esc(i)}</li>`).join("")}</ol>${SCD[sid].y ? `<div class="muted">${esc(SCD[sid].y)}</div>` : ""}</details>` : ""}${SC_ANLAM[sid] ? `<div class="small muted">Anlamlı değişim ≥ ${SC_ANLAM[sid][0]} ${esc(sc.birim || "")}</div>` : ""}</td><td class="small">${l ? esc(scaleLabel(sc, l.deger)) + "<br><span class='muted'>" + fmtDate(l.tarih) + "</span>" : "—"}</td><td style="min-width:130px">${inp}</td><td><input type="text" data-ben="${sid}" placeholder="${sc.alt ? "Bölge/kas (zorunlu)" : "Not"}"></td></tr>`; }).join("");
+    return `<tr><td><b>${esc(sc.ad)}</b>${typeof ANKET !== "undefined" && ANKET[sid] ? `<details class="small ank-d" style="margin-top:4px"><summary>Formla doldur (${ANKET[sid].maddeler.length} madde)</summary>${anketFormHTML(sid)}</details>` : ""}${SCD[sid]?.u ? `<details class="small" style="margin-top:4px"><summary style="cursor:pointer;color:var(--teal)">Nasıl uygulanır?</summary><ol style="padding-left:18px;margin:4px 0">${SCD[sid].u.map(i => `<li>${esc(i)}</li>`).join("")}</ol>${SCD[sid].y ? `<div class="muted">${esc(SCD[sid].y)}</div>` : ""}</details>` : ""}${SC_ANLAM[sid] ? `<div class="small muted">Anlamlı değişim ≥ ${SC_ANLAM[sid][0]} ${esc(sc.birim || "")}</div>` : ""}</td><td class="small">${l ? esc(scaleLabel(sc, l.deger)) + "<br><span class='muted'>" + fmtDate(l.tarih) + "</span>" : "—"}</td><td style="min-width:130px">${inp}</td><td><input type="text" data-ben="${sid}" placeholder="${sc.alt ? "Bölge/kas (zorunlu)" : "Not"}"></td></tr>`; }).join("");
   modal(`${evalStatus(p).durum === "yok" ? "Başlangıç" : "Ara"} değerlendirme – ${esc(p.ad)}`, `<div class="note info small" style="margin-bottom:12px">Ölçümleri başlangıçla AYNI koşullarda yapın: aynı ölçen, gün saati, talimat ve yardımcı cihaz${pAlan(p) === "noro" ? "; Parkinson'da aynı ilaç dönemi (ON/OFF)" : ""}. Boş bıraktığınız ölçekler kaydedilmez.</div>
    <div class="row" style="margin-bottom:10px"><label class="f" style="max-width:180px">Tarih<input type="date" id="be-d" value="${today()}"></label><span class="sp"></span><button class="btn sm ghost" id="be-more">${ic("plus")} Başka ölçek</button></div>
    <table class="tbl-in"><thead><tr><th>Ölçek</th><th>Önceki</th><th>Bugün</th><th>Not</th></tr></thead><tbody id="be-body">${rows}</tbody></table>
@@ -4567,7 +4920,7 @@ function batchEval(p){
     document.querySelectorAll("[data-be]").forEach(el => { const v = el.value; if (v === "") return; const sc = S(el.dataset.be); const note = (document.querySelector(`[data-ben="${el.dataset.be}"]`)?.value || "").trim();
       if (!sc.sec && (+v < sc.min || +v > sc.max)){ err = `${sc.ad}: ${sc.min}–${sc.max}`; return; }
       if (sc.alt && !note){ err = `${sc.ad}: bölge/kas notu gerekli`; return; }
-      (p.olcumler = p.olcumler || []).push({id:uid(), sid:sc.id, deger:+v, tarih:d, not:note}); n++; });
+      (p.olcumler = p.olcumler || []).push(Object.assign({id:uid(), sid:sc.id, deger:+v, tarih:d, not:note}, ANK_TMP[sc.id] ? {maddeler:ANK_TMP[sc.id]} : {})); n++; }); ANK_TMP = {};
     if (err){ toast(err); return; }
     const y = $("#be-yorum").value.trim(); if (y) (p.degNotlari = p.degNotlari || []).push({tarih:d, metin:y});
     if (!n && !y){ toast("Hiç değer girilmedi"); return; }
@@ -4595,13 +4948,14 @@ function addMeasure(p, sid){
   const opts = [...new Set(["", ...(p.condIds || []).flatMap(id => C(id)?.olcek || [])])].filter(Boolean);
   const kats = [...new Set(SCALES.map(s => s.kat))];
   const sel = `<select id="m-s">${opts.length ? `<optgroup label="Önerilen">${opts.map(id => `<option value="${id}">${esc(S(id).ad)}</option>`).join("")}</optgroup>` : ""}${kats.map(k => `<optgroup label="${k}">${SCALES.filter(s => s.kat === k).map(s => `<option value="${s.id}">${esc(s.ad)}</option>`).join("")}</optgroup>`).join("")}</select>`;
-  modal("Ölçüm ekle", `<label class="f">Ölçek${sel}</label><div id="m-info" class="note info small" style="margin:10px 0"></div><div class="grid g2"><label class="f">Değer<span id="m-vwrap"></span></label><label class="f">Tarih<input type="date" id="m-d" value="${today()}"></label></div><label class="f" style="margin-top:10px" id="m-nlab">Not<input type="text" id="m-n" placeholder=""></label>`,
+  modal("Ölçüm ekle", `<label class="f">Ölçek${sel}</label><div id="m-info" class="note info small" style="margin:10px 0"></div><div class="grid g2"><label class="f">Değer<span id="m-vwrap"></span></label><label class="f">Tarih<input type="date" id="m-d" value="${today()}"></label></div><label class="f" style="margin-top:10px" id="m-nlab">Not<input type="text" id="m-n" placeholder=""></label><div id="m-ank"></div>`,
     `<button class="btn" data-act="close-modal">Vazgeç</button><button class="btn pri" id="m-save">Kaydet</button>`, "sm");
   const upd = () => {
     const sc = S($("#m-s").value);
     $("#m-info").textContent = [sc.yorum || (sc.min !== undefined ? `Aralık: ${sc.min}–${sc.max} ${sc.birim || ""}` : ""), SC_ANLAM[sc.id] ? "Anlamlı değişim: " + SC_ANLAM[sc.id][1] : ""].filter(Boolean).join(" ");
     $("#m-info").style.display = $("#m-info").textContent ? "" : "none";
     $("#m-vwrap").innerHTML = sc.sec ? `<select id="m-v">${sc.sec.map(o => `<option value="${o[0]}">${esc(o[1])}</option>`).join("")}</select>` : `<input type="number" id="m-v" min="${sc.min}" max="${sc.max}" step="${sc.adim}" placeholder="${sc.min}–${sc.max}">`;
+    ANK_TMP = {}; $("#m-ank").innerHTML = typeof ANKET !== "undefined" && ANKET[sc.id] ? `<details class="small ank-d" style="margin-top:10px" open><summary>Formla doldur (${ANKET[sc.id].maddeler.length} madde) – toplam otomatik hesaplanır</summary>${anketFormHTML(sc.id, {}, "tek")}</details>` : "";
     $("#m-n").placeholder = sc.alt ? "Zorunlu: eklem/kas/bölge (ör. Sağ diz fleksiyon)" : "İsteğe bağlı";
   };
   if (sid) $("#m-s").value = sid;
@@ -4611,7 +4965,7 @@ function addMeasure(p, sid){
     if (v === "" || isNaN(+v)){ toast("Değer girin"); return; }
     if (!sc.sec && (+v < sc.min || +v > sc.max)){ toast(`Değer ${sc.min}–${sc.max} arasında olmalı`); return; }
     if (sc.alt && !n){ toast("Bu ölçek için bölge/kas notu gerekli"); return; }
-    p.olcumler = p.olcumler || []; p.olcumler.push({id:uid(), sid:sc.id, deger:+v, tarih:$("#m-d").value || today(), not:n});
+    p.olcumler = p.olcumler || []; p.olcumler.push(Object.assign({id:uid(), sid:sc.id, deger:+v, tarih:$("#m-d").value || today(), not:n}, ANK_TMP[sc.id] ? {maddeler:ANK_TMP[sc.id]} : {})); ANK_TMP = {};
     p.guncel = new Date().toISOString(); save(); closeModal(); render(); toast("Ölçüm kaydedildi");
   };
 }
@@ -4920,16 +5274,25 @@ function vLib(){
 function chipRow(key, obj){ return `<div class="chips">${Object.entries(obj).map(([k, v]) => `<button class="chip ${V[key] === k ? "on" : ""}" data-chip="${key}" data-v="${k}">${esc(v)}</button>`).join("")}</div>`; }
 function openCond(c){
   const ul = a => `<ul>${a.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
-  modal(esc(c.ad), `<div class="det">${alanTag(c.alan)}<p style="margin:10px 0 0">${esc(c.ozet)}</p>
+  const H = (n, t) => `<h3 class="vh"><span>${n}</span>${t}</h3>`;
+  const formVar = id => typeof ANKET !== "undefined" && ANKET[id];
+  modal(esc(c.ad), `<div class="det vaka-fmt">${alanTag(c.alan)}<span class="small muted" style="margin-left:8px">Vaka sunumu formatında protokol</span>
+  ${H(1, "Hastalığın tanımı")}<p style="margin:0">${esc(c.ozet)}</p>
   ${c.dikkat?.length ? `<div class="note warn" style="margin-top:12px"><b>Dikkat / kırmızı bayraklar</b>${ul(c.dikkat)}</div>` : ""}
-  <h3>Değerlendirme – ölçekler</h3><div class="chips">${c.olcek.map(id => `<button class="chip" data-act="open-scale" data-id="${id}">${esc(S(id).ad)}</button>`).join("")}</div>${(COND_TEST[c.id] || []).length ? `<h3>Özel klinik testler</h3><div class="chips">${COND_TEST[c.id].map(id => `<button class="chip" data-act="open-test" data-id="${id}">${esc(T(id).ad)}</button>`).join("")}</div>` : ""}
-  <p class="small muted" style="margin:6px 0 0">Ara değerlendirme önerisi: ${esc(DEG_ZAMAN.alan[c.alan])} <a href="#" data-act="open-rehber" data-id="r_deg">Ayrıntı</a></p>
-  <h3>ICF problem alanları (örnek)</h3><div class="grid g4">${Object.entries(ICF_SEVIYE).map(([k, v]) => `<div><b class="small">${v}</b><ul class="small" style="padding-left:16px">${ICF_ALAN[c.alan][k].map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>
-  <div class="grid g2"><div><h3>Kısa dönem hedefler</h3>${ul(c.hedefKisa)}</div><div><h3>Uzun dönem hedefler</h3>${ul(c.hedefUzun)}</div></div>
-  ${c.evreler?.length ? `<h3>Evreler / fazlar</h3>${c.evreler.map(e => `<div class="phase"><b>${esc(e.ad)}</b>${esc(e.icerik)}</div>`).join("")}` : ""}
-  ${c.ktape && c.ktape.length ? `<h3>K-Taping tarifi</h3>${c.ktape.map(id => { const k = KTAPE.find(x => x.id === id); return `<div class="phase"><b>${esc(k.ad)} <span class="tag gray">${esc(k.teknik)}</span></b><span class="small">${esc(k.ozet)}</span></div>`; }).join("")}<p class="small muted" style="margin:4px 0 0">Kaynak: Kumbrink, K Taping (2012)</p>` : ""}
-  <h3>Tedavi yöntemleri</h3><div class="chips">${c.yontem.map(id => `<button class="chip" data-act="open-method" data-id="${id}">${esc(M(id).ad)}</button>`).join("")}</div>
-  ${typeof progHTML === "function" ? progHTML(c) : ""}
+  ${H(2, "Değerlendirme")}<p class="small muted" style="margin:0 0 6px">Öykü (başvuru nedeni, tıbbi tanı ve seyir, eşlik eden hastalıklar, ilaçlar, sosyal durum) + aşağıdaki ölçekler ve testler. 📋 işaretli ölçekler form olarak madde madde doldurulabilir.</p>
+  <div class="chips">${c.olcek.map(id => `<button class="chip" data-act="open-scale" data-id="${id}">${formVar(id) ? "📋 " : ""}${esc(S(id).ad)}</button>`).join("")}</div>
+  ${(COND_TEST[c.id] || []).length ? `<div class="small" style="margin:10px 0 4px;font-weight:600">Özel klinik testler</div><div class="chips">${COND_TEST[c.id].map(id => `<button class="chip" data-act="open-test" data-id="${id}">${esc(T(id).ad)}</button>`).join("")}</div>` : ""}
+  ${c.alan === "noro" ? `<p class="small" style="margin:8px 0 0">Nörolojik muayene: duyu, refleksler, patolojik refleksler, tonus (MAS/Tardieu), kranial sinirler, koordinasyon → hasta sayfasındaki <b>Nöro muayene</b> sekmesi.</p>` : ""}
+  <p class="small muted" style="margin:6px 0 0">Ara değerlendirme: ${esc(DEG_ZAMAN.alan[c.alan] || "")} <a href="#" data-act="open-rehber" data-id="r_deg">Ayrıntı</a></p>
+  ${H(3, "Problem listesi, nedenleri ve tedavi yaklaşımı")}${typeof probHTML === "function" ? probHTML(c) : ""}
+  ${H(4, "Hedefler")}<div class="grid g2"><div><b class="small">Kısa dönem</b>${ul(c.hedefKisa)}</div><div><b class="small">Uzun dönem</b>${ul(c.hedefUzun)}</div></div>
+  ${H(5, "Tedavi yöntemleri")}<div class="chips">${c.yontem.map(id => `<button class="chip" data-act="open-method" data-id="${id}">${esc(M(id).ad)}</button>`).join("")}</div>
+  ${c.evreler?.length ? `<div class="small" style="margin:12px 0 4px;font-weight:600">Evreler / dönemler</div>${c.evreler.map(e => `<div class="phase"><b>${esc(e.ad)}</b>${esc(e.icerik)}</div>`).join("")}` : ""}
+  ${c.ktape && c.ktape.length ? `<div class="small" style="margin:12px 0 4px;font-weight:600">K-Taping tarifi</div>${c.ktape.map(id => { const k = KTAPE.find(x => x.id === id); return `<div class="phase"><b>${esc(k.ad)} <span class="tag gray">${esc(k.teknik)}</span></b><span class="small">${esc(k.ozet)}</span></div>`; }).join("")}` : ""}
+  ${H(6, "Egzersiz programı ve gidişat")}${typeof progHTML === "function" ? progHTML(c).replace(/^<h3>[^<]*<\/h3>/, "") : ""}
+  ${H(7, "Örnek seans programı")}${typeof ornekSeansHTML === "function" ? ornekSeansHTML(c) : ""}
+  ${H(8, "Ev programı")}<p class="small" style="margin:0">Hasta sayfasında <b>Tedavi programı → Egzersiz gidişatı</b> bölümünde faz seçince ev programı o fazın egzersizleri ve dozlarıyla otomatik oluşur; <b>Hasta çıktısı</b> resimli talimat ve haftalık takip çizelgesiyle yazdırılır.</p>
+  ${H(9, "ICF çerçevesi")}<div class="grid g4">${Object.entries(ICF_SEVIYE).map(([k, v]) => `<div><b class="small">${v}</b><ul class="small" style="padding-left:16px">${(ICF_ALAN[c.alan]?.[k] || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>
   ${typeof vakaCondHTML === "function" ? vakaCondHTML(c) : ""}</div>`,
   `<button class="btn" data-act="close-modal">Kapat</button><button class="btn" data-act="cond-apply" data-id="${c.id}">Mevcut hastaya uygula</button><button class="btn pri" data-act="cond-new" data-id="${c.id}">${ic("plus")} Bu protokolle yeni hasta</button>`, "lg");
 }
@@ -4949,6 +5312,7 @@ function openScale(sc){
   const used = CONDITIONS.filter(c => c.olcek.includes(sc.id));
   modal(esc(sc.ad), `<div class="det"><span class="tag gray">${esc(sc.kat)}</span><span class="tag" style="margin-left:6px">${sc.yon === -1 ? "Düşük puan daha iyi" : sc.yon === 1 ? "Yüksek puan daha iyi" : "Sınıflama"}</span>
   ${scaleHowHTML(sc)}
+  ${typeof ANKET !== "undefined" && ANKET[sc.id] ? `<h3>Form maddeleri (${ANKET[sc.id].maddeler.length})</h3><details class="small"><summary style="cursor:pointer;color:var(--teal)">Maddeleri göster</summary>${anketFormHTML(sc.id, {}, "onizleme")}</details><div class="row" style="margin-top:8px"><button class="btn sm" data-act="anket-yazdir" data-id="${sc.id}">${ic("print")} Boş formu indir / yazdır</button><span class="small muted">Hasta sayfasında ölçüm eklerken form madde madde doldurulup toplam otomatik hesaplanır.</span></div>` : ""}
   ${sc.sec ? `<h3>Seçenekler</h3><ul>${sc.sec.map(o => `<li>${esc(o[1])}</li>`).join("")}</ul>` : ""}
   ${used.length ? `<h3>Kullanıldığı protokoller</h3><div class="chips">${used.map(c => `<button class="chip" data-act="open-cond" data-id="${c.id}">${esc(c.ad)}</button>`).join("")}</div>` : ""}
   <p class="small muted" style="margin-top:16px">Ara değerlendirmede aynı koşulları (saat, pozisyon, ilaç durumu, yardımcı cihaz, talimat) koruyun. <a href="#" data-act="open-rehber" data-id="r_deg">Ne zaman anlamlı?</a></p></div>`, `<button class="btn" data-act="close-modal">Kapat</button>`, "lg");
