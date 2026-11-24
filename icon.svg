@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="80" y1="80" x2="430" y2="430"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f7bff"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="#0b0d13"/><rect x="18" y="18" width="476" height="476" rx="96" fill="none" stroke="#1d2230" stroke-width="4"/><g fill="none" stroke="url(#g)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"><path d="M250 120 C200 100 140 130 140 185 C108 200 104 260 140 282 C130 330 175 365 215 350 C232 380 250 384 256 380 L256 120"/><path d="M262 120 C312 100 372 130 372 185 C404 200 408 260 372 282 C382 330 337 365 297 350 C280 380 262 384 256 380"/><path d="M190 200 C215 205 225 225 220 245"/><path d="M322 200 C297 205 287 225 292 245"/><path d="M175 290 C200 285 215 300 215 320"/><path d="M337 290 C312 285 297 300 297 320"/></g><path d="M256 384 L256 430" stroke="url(#g)" stroke-width="22" stroke-linecap="round"/><circle cx="400" cy="112" r="20" fill="#e5203a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22324a"/><stop offset="1" stop-color="#16223a"/></linearGradient></defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<g fill="none" stroke="#f4f1ea" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"><path d="M256 128 C230 108 186 110 172 146 C140 150 122 182 134 210 C114 230 118 268 146 282 C150 314 186 332 214 318 C228 336 248 336 256 324"/>
+<path d="M256 128 C282 108 326 110 340 146 C372 150 390 182 378 210 C398 230 394 268 366 282 C362 314 326 332 298 318 C284 336 264 336 256 324"/>
+<path d="M256 128 V384"/>
+<g stroke-width="7"><path d="M256 172 C232 170 220 186 196 182"/><path d="M174 214 C196 210 214 226 256 224"/><path d="M256 270 C232 266 214 282 190 276"/>
+<path d="M256 172 C280 170 292 186 316 182"/><path d="M338 214 C316 210 298 226 256 224"/><path d="M256 270 C280 266 298 282 322 276"/>
+<path d="M210 182 C204 160 214 148 230 146"/><path d="M302 182 C308 160 298 148 282 146"/></g>
+<path d="M256 352 L236 372 M256 352 L276 372" stroke-width="7"/>
+<circle cx="378" cy="132" r="16" fill="#d4a857" stroke="#d4a857"/></g></svg>

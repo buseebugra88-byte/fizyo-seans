@@ -1,6 +1,6 @@
 // Fizyo Seans — çevrimdışı çalışma (service worker)
 // Sayfalar değişince C'deki sürümü bir artır; eski önbellek kendiliğinden silinir.
-const C='fizyo-seans-v1';
+const C='fizyo-seans-v2';
 const YEREL=["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon.svg", "./apple-touch-icon.png"];
 const CDN=[];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>Promise.all([
